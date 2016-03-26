@@ -90,6 +90,8 @@ public:
 
 	// put your code for path tracing with photon gathering here
     
+		Color3f CHANGEME(1.0f, 0.0f, 0.0f);
+		return CHANGEME;
     }
 
     virtual std::string toString() const {

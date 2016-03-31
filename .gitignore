@@ -20,3 +20,4 @@ rules.ninja
 *.opendb
 Debug
 x64
+vs2013_x64/

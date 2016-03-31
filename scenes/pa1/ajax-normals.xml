@@ -1,11 +1,11 @@
 <scene>
 	<!-- Independent sample generator, user-selected samples per pixel -->
 	<sampler type="independent">
-		<integer name="sampleCount" value="512"/>
+		<integer name="sampleCount" value="32"/>
 	</sampler>
 
 	<!-- Use the normal integrator -->
-    <integrator type="normals"/>
+        <integrator type="normals"/>
 
 	<!-- Render the scene as viewed by a perspective camera -->
 	<camera type="perspective">

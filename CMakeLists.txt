@@ -74,6 +74,7 @@ add_executable(nori
   src/independent.cpp
   src/main.cpp
   src/mesh.cpp
+  src/normals.cpp
   src/obj.cpp
   src/object.cpp
   src/parser.cpp

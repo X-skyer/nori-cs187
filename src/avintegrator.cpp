@@ -32,18 +32,18 @@ public:
 			Else return Color3f(0.0f) if occluded.
 		*/
 
-		if (scene->rayIntersect(ray, av_isect))
+		if (scene->rayIntersect(refl_ray, av_isect))
 			return Color3f(0.0f);
 		else return Color3f(1.0f);
 	}
 
 	std::string toString() const {
-		return "AVIntegrator[]";
+		return tfm::format("AVIntegrator[length=%i]", m_length);
 	}
 
 private:
 	float m_length;						// maximum length of the average visibility ray shot from intersection point.
 };
 
-NORI_REGISTER_CLASS(AVIntegrator, "avintegrator");
+NORI_REGISTER_CLASS(AVIntegrator, "av");
 NORI_NAMESPACE_END

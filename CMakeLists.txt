@@ -64,6 +64,7 @@ add_executable(nori
   include/nori/warp.h
 
   # Source code files
+  src/avintegrator.cpp
   src/bitmap.cpp
   src/block.cpp
   src/bvh.cpp

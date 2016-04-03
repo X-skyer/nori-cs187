@@ -47,12 +47,13 @@ add_executable(nori
   include/nori/color.h
   include/nori/common.h
   include/nori/dpdf.h
+  include/nori/emitter.h
   include/nori/frame.h
   include/nori/integrator.h
-  include/nori/emitter.h
   include/nori/mesh.h
   include/nori/object.h
   include/nori/parser.h
+  include/nori/pointlight.h
   include/nori/proplist.h
   include/nori/ray.h
   include/nori/rfilter.h
@@ -80,6 +81,7 @@ add_executable(nori
   src/object.cpp
   src/parser.cpp
   src/perspective.cpp
+  src/pointlight.cpp
   src/proplist.cpp
   src/render.cpp
   src/rfilter.cpp

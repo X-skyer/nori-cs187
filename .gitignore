@@ -3,6 +3,8 @@
 /nori
 /warptest
 /ext_build
+/build_xcode/
+/scenes
 CMakeCache.txt
 CMakeFiles
 Makefile

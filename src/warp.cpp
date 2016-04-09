@@ -47,11 +47,16 @@ float Warp::squareToUniformSquarePdf(const Point2f &sample) {
 }
 
 Point2f Warp::squareToUniformDisk(const Point2f &sample) {
-    throw NoriException("Warp::squareToUniformDisk() is not yet implemented!");
+    float r = sqrtf(sample.x());
+    float theta = 2 * M_PI * sample.y();
+    float x = r * cos(theta);
+    float y = r * sin(theta);
+    return Point2f(x, y);
 }
 
 float Warp::squareToUniformDiskPdf(const Point2f &p) {
-    throw NoriException("Warp::squareToUniformDiskPdf() is not yet implemented!");
+    if(p.x() * p.x() + p.y() * p.y() < 1.0f) return INV_PI;
+    else return 0.0f;
 }
 
 Vector3f Warp::squareToUniformSphereCap(const Point2f &sample, float cosThetaMax) {
@@ -63,11 +68,13 @@ float Warp::squareToUniformSphereCapPdf(const Vector3f &v, float cosThetaMax) {
 }
 
 Vector3f Warp::squareToUniformSphere(const Point2f &sample) {
-    throw NoriException("Warp::squareToUniformSphere() is not yet implemented!");
+    float theta = acosf(2 * sample.x() - 1.0f);
+    float phi = 2 * M_PI * sample.y();
+    return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
 float Warp::squareToUniformSpherePdf(const Vector3f &v) {
-    throw NoriException("Warp::squareToUniformSpherePdf() is not yet implemented!");
+    return INV_FOURPI;
 }
 
 Vector3f Warp::squareToUniformHemisphere(const Point2f &sample) {

@@ -14,7 +14,7 @@ public:
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
-			return Color3f(0.0f);
+			return Color3f(1.0f);
 
 
 		/*
@@ -23,7 +23,9 @@ public:
 		*/
 
 		Vector3f rand_dir = Warp::sampleUniformHemisphere(sampler, its.shFrame.n);
-		Ray3f refl_ray(its.p, rand_dir, Epsilon, m_length);
+        Vector3f wrand_dir = its.toWorld(rand_dir);
+        
+		Ray3f refl_ray(its.p, wrand_dir, Epsilon, m_length);
 		Intersection av_isect;
 
 

@@ -63,7 +63,7 @@ float Warp::squareToUniformDiskPdf(const Point2f &p) {
 
 /* Uniform Sphere */
 Vector3f Warp::squareToUniformSphere(const Point2f &sample) {
-    float theta = acosf(2.0f * sample.x() - 1.0f);
+    float theta = acosf(1.0f - 2 * sample.x());
     float phi = 2.0f * M_PI * sample.y();
     return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
@@ -89,11 +89,15 @@ float Warp::squareToUniformHemispherePdf(const Vector3f &v) {
 
 /* Sphere Cap */
 Vector3f Warp::squareToUniformSphereCap(const Point2f &sample, float cosThetaMax) {
-    throw NoriException("Warp::squareToUniformSphereCap() is not yet implemented!");
+    float theta = acosf(1.0f - (1.0f - cosThetaMax) * sample.x());
+    float phi = 2.0f * M_PI * sample.y();
+    return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
 float Warp::squareToUniformSphereCapPdf(const Vector3f &v, float cosThetaMax) {
-    throw NoriException("Warp::squareToUniformSphereCapPdf() is not yet implemented!");
+    float cos_theta = Frame::cosTheta(v);
+    if(cos_theta <= cosThetaMax) return 0.0f;
+    return INV_TWOPI * (1.0f / (1.0f - cosThetaMax));
 }
 
 

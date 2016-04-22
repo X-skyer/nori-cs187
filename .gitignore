@@ -5,6 +5,7 @@
 /ext_build
 /build_xcode/
 /scenes
+/build_vs2015/
 CMakeCache.txt
 CMakeFiles
 Makefile

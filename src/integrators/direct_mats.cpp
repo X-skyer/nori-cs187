@@ -20,7 +20,7 @@ public:
 
 	Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &ray) const
 	{
-
+		return 0.0f;
 	}
 
 	std::string toString() const

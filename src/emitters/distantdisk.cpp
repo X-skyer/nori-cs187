@@ -1,4 +1,5 @@
 #include "distantdisk.h"
+#include <nori/frame.h>
 #include <nori/warp.h>
 
 NORI_NAMESPACE_BEGIN
@@ -6,7 +7,7 @@ NORI_NAMESPACE_BEGIN
 DistantDisk::DistantDisk(const PropertyList & props)
 {
 	m_radiance = props.getColor("radiance");
-	m_thetaA = props.getFloat("thetaA");
+	m_thetaA = degToRad(props.getFloat("thetaA"));
 	m_localToWorld = props.getTransform("toWorld", Transform());
 	m_worldToLocal = m_localToWorld.getInverseMatrix();
 
@@ -30,18 +31,28 @@ Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample) c
 	lRec.dist = INFINITY;
 	lRec.emitter = this;
 	lRec.n = m_localToWorld * Vector3f(0.0f, 0.0f, 1.0f);
-
-	return m_radiance;
+	return m_radiance / sampled_pdf;
 }
 
 float DistantDisk::pdf(const EmitterQueryRecord & lRec) const
 {
-	return 0.0f;
+	Vector3f world_dir = -lRec.wi;
+	Vector3f local_dir = m_worldToLocal * world_dir;
+	return Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
 }
 
 Color3f DistantDisk::eval(const EmitterQueryRecord & lRec) const
 {
-	return Color3f();
+	Vector3f world_dir = -lRec.wi;
+	Vector3f local_dir = m_worldToLocal * world_dir;
+	if (Frame::cosTheta(local_dir) >= m_cosThetaMax) return m_radiance;
+	else return 0.0f;
 }
 
+std::string DistantDisk::toString() const
+{
+	return tfm::format("DistantDisk[Radiance={%f,%f,%f}\n thetaA:%f]", m_radiance.x(), m_radiance.y(), m_radiance.z(), m_thetaA);
+}
+
+NORI_REGISTER_CLASS(DistantDisk, "distantdisk")
 NORI_NAMESPACE_END

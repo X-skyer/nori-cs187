@@ -24,6 +24,8 @@ public:
 
 	virtual Color3f eval(const EmitterQueryRecord &lRec) const;
 
+	std::string toString() const;
+
 private:
 	Color3f m_radiance;
 	float   m_thetaA;

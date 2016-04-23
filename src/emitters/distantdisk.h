@@ -18,11 +18,11 @@ public:
 
 	~DistantDisk();
 
-	virtual Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample) const;
+	Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample) const;
 
-	virtual float pdf(const EmitterQueryRecord &lRec) const;
+	float pdf(const EmitterQueryRecord &lRec) const;
 
-	virtual Color3f eval(const EmitterQueryRecord &lRec) const;
+	Color3f eval(const EmitterQueryRecord &lRec) const;
 
 	std::string toString() const;
 

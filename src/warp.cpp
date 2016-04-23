@@ -57,7 +57,7 @@ Point2f Warp::squareToUniformDisk(const Point2f &sample) {
 }
 
 float Warp::squareToUniformDiskPdf(const Point2f &p) {
-    if(p.x() * p.x() + p.y() * p.y() < 1.0f) return INV_PI;
+    if(p.x() * p.x() + p.y() * p.y() <= 1.0f) return INV_PI;
     else return 0.0f;
 }
 
@@ -82,7 +82,7 @@ Vector3f Warp::squareToUniformHemisphere(const Point2f &sample) {
 
 float Warp::squareToUniformHemispherePdf(const Vector3f &v) {
     float cos_theta = Frame::cosTheta(v);
-    if(cos_theta <= 0.0f) return 0.0f;
+    if(cos_theta < 0.0f) return 0.0f;
     return 1.0f / (2.0f * M_PI);
 }
 
@@ -96,7 +96,7 @@ Vector3f Warp::squareToUniformSphereCap(const Point2f &sample, float cosThetaMax
 
 float Warp::squareToUniformSphereCapPdf(const Vector3f &v, float cosThetaMax) {
     float cos_theta = Frame::cosTheta(v);
-    if(cos_theta <= cosThetaMax) return 0.0f;
+    if(cos_theta < cosThetaMax) return 0.0f;
     return INV_TWOPI * (1.0f / (1.0f - cosThetaMax));
 }
 
@@ -110,7 +110,7 @@ Vector3f Warp::squareToCosineHemisphere(const Point2f &sample) {
 
 float Warp::squareToCosineHemispherePdf(const Vector3f &v) {
     float cos_theta = Frame::cosTheta(v);
-    if(cos_theta <= 0.0f) return 0.0f;
+    if(cos_theta < 0.0f) return 0.0f;
     return cos_theta / M_PI;
 }
 

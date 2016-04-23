@@ -28,6 +28,7 @@
 #include <nori/gui.h>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
+#include <tbb/task_scheduler_init.h>
 #include <filesystem/resolver.h>
 #include <tbb/concurrent_vector.h>
 
@@ -109,7 +110,7 @@ void RenderThread::renderScene(const std::string & filename) {
 
     NoriObject* root = loadFromXML(filename);
 
-    // When the XML root object is a scene, start rendering it ..
+	// When the XML root object is a scene, start rendering it ..
     if (root->getClassType() == NoriObject::EScene) {
         m_scene = static_cast<Scene *>(root);
 

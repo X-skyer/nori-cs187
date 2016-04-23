@@ -24,9 +24,9 @@ Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample) c
 	// Sample in local coordinate frame
 	Vector3f sampled_dir = Warp::squareToUniformSphereCap(sample, m_cosThetaMax);
 	float sampled_pdf = Warp::squareToUniformSphereCapPdf(sampled_dir, m_cosThetaMax);
-
+	
 	// Convert to world coordinate frame
-	lRec.wi = -(m_localToWorld * sampled_dir);
+	lRec.wi = (m_localToWorld * sampled_dir);
 	lRec.pdf = sampled_pdf;
 	lRec.dist = INFINITY;
 	lRec.emitter = this;
@@ -45,8 +45,7 @@ Color3f DistantDisk::eval(const EmitterQueryRecord & lRec) const
 {
 	Vector3f world_dir = -lRec.wi;
 	Vector3f local_dir = m_worldToLocal * world_dir;
-	if (Frame::cosTheta(local_dir) >= m_cosThetaMax) return m_radiance;
-	else return 0.0f;
+	return Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
 }
 
 std::string DistantDisk::toString() const

@@ -49,7 +49,7 @@ public:
 			{
 				// If unoccluded to the light source, compute the lighting term and add contributions.
 				BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
-				Ld += bsdf->eval(bRec) * Li * std::max(its.geoFrame.n.dot(eRec.wi), 0.0f);
+				Ld += bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 			}
 		}
 

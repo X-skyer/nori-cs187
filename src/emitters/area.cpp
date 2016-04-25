@@ -4,7 +4,7 @@ NORI_NAMESPACE_BEGIN
 
 AreaEmitter::AreaEmitter(const PropertyList& props)
 {
-
+	m_radiance = props.getColor("radiance");
 }
 
 AreaEmitter::~AreaEmitter()

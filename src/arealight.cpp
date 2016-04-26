@@ -25,7 +25,7 @@ NORI_NAMESPACE_BEGIN
 class AreaEmitter : public Emitter {
 public:
     AreaEmitter(const PropertyList &props) {
-        m_radiance = props.getColor("radiance");
+        m_radiance = props.getColor("radiance");		
     }
 
     virtual std::string toString() const {
@@ -40,6 +40,7 @@ public:
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
+		// Return radiance only from the outside.
 		if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
 		else return 0.0f;
     }

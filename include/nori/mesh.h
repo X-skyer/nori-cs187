@@ -22,6 +22,7 @@
 #include <nori/object.h>
 #include <nori/frame.h>
 #include <nori/bbox.h>
+#include <nori/dpdf.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -92,7 +93,7 @@ public:
      */
     void samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const;
 
-    /// Return the surface area of the given triangle
+	/// Return the surface area of the given triangle
     float surfaceArea(uint32_t index) const;
 
     //// Return an axis-aligned bounding box of the entire mesh
@@ -188,6 +189,7 @@ protected:
     BSDF         *m_bsdf = nullptr;      ///< BSDF of the surface
     Emitter    *m_emitter = nullptr;     ///< Associated emitter, if any
     BoundingBox3f m_bbox;                ///< Bounding box of the mesh
+	DiscretePDF	  m_pdfs;			     // We store pdfs for sampling the mesh.
 };
 
 NORI_NAMESPACE_END

@@ -81,9 +81,18 @@ public:
     }
 
     /// Evaluate the BRDF for the given pair of directions
-    virtual Color3f eval(const BSDFQueryRecord &bRec) const {
-    	throw NoriException("MicrofacetBRDF::eval(): not implemented!");
-    }
+	virtual Color3f eval(const BSDFQueryRecord &bRec) const {
+		Color3f diffuse = m_kd * INV_PI;
+
+		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+		float D = evalBeckmann(w_h);
+		float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
+		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wi, w_h);
+
+		Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+
+		return diffuse + specular;
+	}
 
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
@@ -92,7 +101,23 @@ public:
 
     /// Sample the BRDF
     virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample) const {
-    	throw NoriException("MicrofacetBRDF::sample(): not implemented!");
+		if (_sample.x() < m_ks)
+		{
+			// Diffuse sampling.
+			bRec.wo = Warp::squareToCosineHemisphere(_sample);
+			return m_kd * INV_PI;
+		}
+		else
+		{
+			// Specular sampling.
+			bRec.wo = Warp::squareToBeckmann(_sample, m_alpha);
+			Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+			float D = evalBeckmann(w_h);
+			float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
+			float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wi, w_h);
+
+			return m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+		}
     }
 
     virtual std::string toString() const {

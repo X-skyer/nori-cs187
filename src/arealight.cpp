@@ -40,7 +40,8 @@ public:
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-        throw NoriException("To implement...");
+        // Check if the ray intersects the mesh
+		
     }
 
     virtual Color3f sample(EmitterQueryRecord & lRec, const Point2f & sample) const {
@@ -61,6 +62,14 @@ public:
     virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2) const {
         throw NoriException("To implement...");
     }
+
+	// Get the parent mesh
+	void setParent(NoriObject *parent)
+	{
+		auto type = parent->getClassType();
+		if (type == EMesh)
+			m_mesh = static_cast<Mesh*>(parent);
+	}
 
 
 protected:

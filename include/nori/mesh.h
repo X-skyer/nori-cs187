@@ -170,6 +170,11 @@ public:
      * */
     EClassType getClassType() const { return EMesh; }
 
+	/**/
+	void sample(const Point2f& sample, Point3f& sampled_position, Normal3f& sampled_normal) const;
+
+	void pdf() const;
+
 protected:
     /// Create an empty mesh
     Mesh();

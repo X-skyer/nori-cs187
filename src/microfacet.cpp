@@ -96,7 +96,8 @@ public:
 
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
-    	throw NoriException("MicrofacetBRDF::pdf(): not implemented!");
+		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+		return m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * (1.0f / (4 * w_h.dot(bRec.wo))) + (1.0f - m_ks) * Frame::cosTheta(bRec.wo) * INV_PI;
     }
 
     /// Sample the BRDF

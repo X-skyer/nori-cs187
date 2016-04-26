@@ -36,12 +36,12 @@ public:
                 m_radiance.toString());
     }
 
-    virtual Color3f eval(const EmitterQueryRecord & lRec) const {
+	virtual Color3f eval(const EmitterQueryRecord & lRec) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-        // Check if the ray intersects the mesh
-		
+		if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
+		else return 0.0f;
     }
 
     virtual Color3f sample(EmitterQueryRecord & lRec, const Point2f & sample) const {

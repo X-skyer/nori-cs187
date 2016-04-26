@@ -34,9 +34,21 @@ public:
 					return e->eval(eRec);
 				}
 			}
+			return Color3f(0.0f);
 		}
 
 		/* Intersection found */
+		// Check for intersection if a direct light source.
+		if (its.mesh->isEmitter())
+		{
+			EmitterQueryRecord eRec;
+			eRec.ref = ray.o;
+			eRec.wi = ray.d;
+			const Emitter* e = its.mesh->getEmitter();
+			return e->eval(eRec);
+		}
+
+		// Else do light sampling.
 		Color3f Ld(0.0f);
 		const BSDF* bsdf = its.mesh->getBSDF();
 		for (auto e : scene->getLights())
@@ -54,6 +66,12 @@ public:
 			{
 				// If unoccluded to the light source, compute the lighting term and add contributions.
 				BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
+				Color3f evalTerm = bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
+				if (!evalTerm.isValid())
+				{
+					std::cout << "Invalid term" << std::endl;
+				}
+				Ld += evalTerm;
 			}
 		}
 

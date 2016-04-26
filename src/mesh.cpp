@@ -40,27 +40,31 @@ void Mesh::activate() {
     }
 
 	// create the pdf
-	float totalArea = 0.0f;
-	m_pdfs.reserve(getTriangleCount());
-	for (auto i = 0; i < getTriangleCount(); i++)
+	for (uint32_t i = 0; i < getTriangleCount(); i++)
 	{
 		float area = surfaceArea(i);
 		m_pdfs.append(area);
-		totalArea += area;
+		m_totalSurfaceArea += area;
 	}
 	m_pdfs.normalize();
 }
 
-void Mesh::samplePosition(const Point2f & sample, Point3f & p, Normal3f & n) const
+void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const
 {
-	auto id = m_pdfs.sample(sample.x());
+	float rnd = sample.x() < 0.5f ? sample.x() * 2.0f : sample.x() * 2.0f - 1.0f;
+	auto id = m_pdfs.sample(rnd);
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
 	const Point3f p0 = m_V.col(i0), p1 = m_V.col(i1), p2 = m_V.col(i2);
 	const Normal3f n0 = m_N.col(i0), n1 = m_N.col(i1), n2 = m_N.col(i2);
 
-	p = (1.0f - sample.x() - sample.y()) * p0 + sample.x() * p1 + sample.y() * p2;
-	n = (1.0f - sample.x() - sample.y()) * n0 + sample.x() * n1 + sample.y() * n2;
+	// barycentric sampling of triangle.
+	float u1 = sqrtf(sample.x());
+	float u = 1.0f - u1;
+	float v = sample.y() * u1;
+
+	p = (1.0f - u - v) * p0 + u * p1 + v * p2;
+	n = (1.0f - u - v) * n0 + u * n1 + v * n2;
 }
 
 float Mesh::surfaceArea(uint32_t index) const {
@@ -163,6 +167,11 @@ std::string Mesh::toString() const {
         m_bsdf ? indent(m_bsdf->toString()) : std::string("null"),
         m_emitter ? indent(m_emitter->toString()) : std::string("null")
     );
+}
+
+float Mesh::pdf() const
+{
+	return 1.0f / m_totalSurfaceArea;
 }
 
 std::string Intersection::toString() const {

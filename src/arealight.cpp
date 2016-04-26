@@ -42,22 +42,46 @@ public:
             throw NoriException("There is no shape attached to this Area light!");
 
 		// Return radiance only from the outside.
-		if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
-		else return 0.0f;
+		//if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
+		//else return 0.0f;
+		return m_radiance;
     }
 
     virtual Color3f sample(EmitterQueryRecord & lRec, const Point2f & sample) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-        throw NoriException("To implement...");
+		// Sample the underlying mesh for a position and normal.
+		m_mesh->samplePosition(sample, lRec.p, lRec.n);
+
+		// Construct the EmitterQueryRecord structure.
+		lRec.wi = (lRec.p - lRec.ref).normalized();
+		lRec.emitter = this;
+		lRec.dist = (lRec.p - lRec.ref).norm();
+		float pA = pdf(lRec);
+
+		// convert pdf to solid angle measure
+		// pW = pA * r^2 / cos(theta)
+		float pW = pA * lRec.dist * lRec.dist / fabsf(lRec.n.dot(-lRec.wi));
+
+		if (pW < 0.0f)
+		{
+			std::cout << "Caught here" << std::endl;
+		}
+
+		lRec.pdf = pW;
+		
+		// Return the appropriately weighted radiance term back
+		if(lRec.pdf != 0.0f) return eval(lRec) / lRec.pdf;
+		else return 0.0f;
     }
 
+	// Returns probability with respect to Area
     virtual float pdf(const EmitterQueryRecord &lRec) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-        throw NoriException("To implement...");
+		return m_mesh->pdf();
     }
 
 

@@ -23,6 +23,15 @@
 
 NORI_NAMESPACE_BEGIN
 
+enum class EmitterType
+{
+	EMITTER_POINT,
+	EMITTER_DISTANT_DISK,
+	EMITTER_AREA,
+	EMITTER_UNKNOWN
+};
+
+
 /**
  * \brief Data record for conveniently querying and sampling the
  * direct illumination technique implemented by a emitter
@@ -129,10 +138,12 @@ public:
      * */
     void setMesh(Mesh * mesh) { m_mesh = mesh; }
 
+	EmitterType getEmitterType() const { return m_type; }
+
 protected:
     /// Pointer to the mesh if the emitter is attached to a mesh
     Mesh * m_mesh = nullptr;
-
+	EmitterType m_type;
 };
 
 inline std::string EmitterQueryRecord::toString() const {

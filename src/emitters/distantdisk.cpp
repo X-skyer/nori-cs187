@@ -6,6 +6,7 @@ NORI_NAMESPACE_BEGIN
 
 DistantDisk::DistantDisk(const PropertyList & props)
 {
+	m_type = EmitterType::EMITTER_DISTANT_DISK;
 	m_radiance = props.getColor("radiance");
 	m_thetaA = degToRad(props.getFloat("thetaA"));
 	m_localToWorld = props.getTransform("toWorld", Transform());

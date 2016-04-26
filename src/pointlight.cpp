@@ -6,6 +6,7 @@ PointLight::PointLight(const PropertyList& prop)
 {
 	m_power = prop.getColor("power");
 	m_position = prop.getPoint3("position");
+	m_type = EmitterType::EMITTER_POINT;
 }
 
 Color3f PointLight::sample(EmitterQueryRecord &lRec, const Point2f &sample) const

@@ -25,7 +25,8 @@ NORI_NAMESPACE_BEGIN
 class AreaEmitter : public Emitter {
 public:
     AreaEmitter(const PropertyList &props) {
-        m_radiance = props.getColor("radiance");		
+		m_type = EmitterType::EMITTER_AREA;
+		m_radiance = props.getColor("radiance");
     }
 
     virtual std::string toString() const {

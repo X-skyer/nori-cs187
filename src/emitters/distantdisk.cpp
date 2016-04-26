@@ -17,6 +17,7 @@ DistantDisk::DistantDisk(const PropertyList & props)
 
 DistantDisk::~DistantDisk()
 {
+	// Empty destructor.
 }
 
 Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample) const
@@ -31,11 +32,15 @@ Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample) c
 	lRec.dist = INFINITY;
 	lRec.emitter = this;
 	lRec.n = m_localToWorld * Vector3f(0.0f, 0.0f, 1.0f);
-	return m_radiance / sampled_pdf;
+	
+	// Appropriately scale the radiance and return back.
+	if (sampled_pdf > 0.0f) return m_radiance / sampled_pdf;
+	else return 0.0f;
 }
 
 float DistantDisk::pdf(const EmitterQueryRecord & lRec) const
 {
+	// Compute the pdf of sampling the direction.
 	Vector3f world_dir = -lRec.wi;
 	Vector3f local_dir = m_worldToLocal * world_dir;
 	return Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
@@ -43,9 +48,12 @@ float DistantDisk::pdf(const EmitterQueryRecord & lRec) const
 
 Color3f DistantDisk::eval(const EmitterQueryRecord & lRec) const
 {
+	// Return radiance only if it's within the accepted limits.
 	Vector3f world_dir = -lRec.wi;
 	Vector3f local_dir = m_worldToLocal * world_dir;
-	return Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
+	float pdf = Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
+	if (pdf > 0.0f) return m_radiance;
+	else return 0.0f;
 }
 
 std::string DistantDisk::toString() const

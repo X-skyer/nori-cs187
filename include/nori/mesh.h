@@ -171,10 +171,7 @@ public:
      * */
     EClassType getClassType() const { return EMesh; }
 
-	/**/
-	void sample(const Point2f& sample, Point3f& sampled_position, Normal3f& sampled_normal) const;
-
-	void pdf() const;
+	float pdf() const;
 
 protected:
     /// Create an empty mesh
@@ -190,6 +187,7 @@ protected:
     Emitter    *m_emitter = nullptr;     ///< Associated emitter, if any
     BoundingBox3f m_bbox;                ///< Bounding box of the mesh
 	DiscretePDF	  m_pdfs;			     // We store pdfs for sampling the mesh.
+	float		  m_totalSurfaceArea;
 };
 
 NORI_NAMESPACE_END

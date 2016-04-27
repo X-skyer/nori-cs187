@@ -110,6 +110,7 @@ public:
 		if (Frame::cosTheta(bRec.wi) <= 0)
 			return Color3f(0.0f);
 
+		bRec.measure = ESolidAngle;
 		// choose which lobe to sample
 		float fdec = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
 		//if(fdec < m_ks)

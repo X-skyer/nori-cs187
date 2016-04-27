@@ -83,6 +83,15 @@ public:
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
+		/*		Ray3f shadow_ray(lRec.ref, lRec.wi, Epsilon, (1.0f - Epsilon) * lRec.dist);
+		for (int i = 0; i < m_mesh->getTriangleCount(); i++)
+		{
+			float u, v, t;
+			if (m_mesh->rayIntersect(i, shadow_ray, u, v, t))
+				return m_mesh->pdf();
+		}
+		*/
+
 		return m_mesh->pdf();
     }
 

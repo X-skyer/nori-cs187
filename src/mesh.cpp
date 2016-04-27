@@ -54,16 +54,24 @@ void Mesh::samplePosition(const Point2f &sample, const float idsample, Point3f &
 	auto id = m_pdfs.sample(idsample);
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
-	const Point3f p0 = m_V.col(i0), p1 = m_V.col(i1), p2 = m_V.col(i2);
-	const Normal3f n0 = m_N.col(i0), n1 = m_N.col(i1), n2 = m_N.col(i2);
-
 	// barycentric sampling of triangle.
 	float u1 = sqrtf(sample.x());
 	float u = 1.0f - u1;
 	float v = sample.y() * u1;
 
+	const Point3f p0 = m_V.col(i0), p1 = m_V.col(i1), p2 = m_V.col(i2);
+	if (m_N.size() != 0)
+	{
+		const Normal3f n0 = m_N.col(i0), n1 = m_N.col(i1), n2 = m_N.col(i2);
+		n = (1.0f - u - v) * n0 + u * n1 + v * n2;
+	}
+	else
+	{
+		n = (p1 - p0).cross(p2 - p0).normalized();
+	}			
+
 	p = (1.0f - u - v) * p0 + u * p1 + v * p2;
-	n = (1.0f - u - v) * n0 + u * n1 + v * n2;
+	
 }
 
 float Mesh::surfaceArea(uint32_t index) const {

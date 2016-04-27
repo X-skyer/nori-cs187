@@ -42,7 +42,7 @@ Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample, f
 float DistantDisk::pdf(const EmitterQueryRecord & lRec) const
 {
 	// Compute the pdf of sampling the direction.
-	Vector3f world_dir = -lRec.wi;
+	Vector3f world_dir = lRec.wi;
 	Vector3f local_dir = m_worldToLocal * world_dir;
 	return Warp::squareToUniformSphereCapPdf(local_dir, m_cosThetaMax);
 }

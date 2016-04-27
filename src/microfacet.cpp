@@ -99,7 +99,12 @@ public:
     virtual float pdf(const BSDFQueryRecord &bRec) const {
 		
 		if (Frame::cosTheta(bRec.wo) <= 0.0f || Frame::cosTheta(bRec.wi) <= 0.0f) return 0.0f;
-		return Warp::squareToCosineHemispherePdf(bRec.wo);
+		
+		float dpdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+		float jacobian = 0.25f / (w_h.dot(bRec.wo));
+		float spdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+		return spdf + dpdf;
     }
 
     /// Sample the BRDF
@@ -107,8 +112,27 @@ public:
 
 		if (Frame::cosTheta(bRec.wi) <= 0)
 			return Color3f(0.0f);
-		bRec.wo = Warp::squareToCosineHemisphere(_sample);
-		return eval(bRec) / pdf(bRec);
+		
+		if (_sample.x() < m_ks)
+		{
+			float new_range_x = _sample.x() / m_ks;
+			// compute specular lobe
+			Point2f new_sample(new_range_x, _sample.y());
+
+			Normal3f w_h = Warp::squareToBeckmann(new_sample, m_alpha);
+			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
+			float jacobian = 0.25f / (w_h.dot(bRec.wo));
+			float pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			return eval(bRec) / pdf;
+		}
+		else
+		{
+			float new_range_x = (_sample.x() - m_ks) / (1.0f - m_ks);
+			Point2f new_sample(new_range_x, _sample.y());
+			bRec.wo = Warp::squareToCosineHemisphere(new_sample);
+			float pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			return eval(bRec) / pdf;
+		}
     }
 
     virtual std::string toString() const {

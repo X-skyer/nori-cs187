@@ -180,10 +180,10 @@ void RenderThread::renderScene(const std::string & filename) {
                 };
 
                 /// Uncomment the following line for single threaded rendering
-                map(range);
+                //map(range);
 
                 /// Default: parallel rendering
-                //tbb::parallel_for(range, map);
+                tbb::parallel_for(range, map);
 
                 blockGenerator.reset();
             }

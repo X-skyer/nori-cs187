@@ -65,12 +65,6 @@ public:
 		Vector3f inv_wi = -lRec.wi;
 		float costheta_there = fabsf(lRec.n.dot(inv_wi));
 		float pW = pA * lRec.dist * lRec.dist / costheta_there;
-
-		if (pW < 0.0f)
-		{
-			std::cout << "Caught here" << std::endl;
-		}
-
 		lRec.pdf = pW;
 		
 		// Return the appropriately weighted radiance term back

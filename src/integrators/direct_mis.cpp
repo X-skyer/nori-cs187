@@ -89,14 +89,12 @@ public:
 					Color3f Li = e->eval(eRec);
 
 					// Compute the direct lighting equation.
-					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
-					if (!evalTerm.isValid())
-					{
-						std::cout << "Invalid term" << std::endl;
-					}
-					
+					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);			
 					float mis = bpdf / (bpdf + lpdf);
-					evalTerm *= mis;
+
+					if(mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
+						evalTerm *= mis;
+					
 					L_bsdf += evalTerm;
 				}
 			}
@@ -115,19 +113,19 @@ public:
 											
 						Color3f Li = e->eval(eRec);
 						float lpdf = e->pdf(eRec);
+						//std::cout << "BSDF_lpdf : " << lpdf << std::endl;
 						Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 						float mis = bpdf / (bpdf + lpdf);
-						if (isnan(mis))
-						{
-							std::cout << "Caught a NAN here" << std::endl;
-						}
-						evalTerm *= mis;
+						if(!isnan(mis) && mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
+							evalTerm *= mis;
+						
 						L_bsdf += evalTerm;
 					}
 				}
 			}
 		}
 
+		
 		{
 			// Emitter sampling
 			const BSDF* bsdf = its.mesh->getBSDF();
@@ -150,24 +148,16 @@ public:
 					// If unoccluded to the light source, compute the lighting term and add contributions.
 					BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
 					Color3f evalTerm = bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
-					if (!evalTerm.isValid())
-					{
-						std::cout << "Invalid term" << std::endl;
-					}
-					
+									
 					// compute MIS term
 					bpdf = bsdf->pdf(bRec);
-					if (isnan(bpdf)) std::cout << "Invalid bpdf term in emitter sampling" << std::endl;
-					else if (isnan(lpdf)) std::cout << "Invalid lpdf term in emitter sampling" << std::endl;
-					float mis = lpdf / (lpdf + bpdf);
-					evalTerm *= mis;
+					float mis = lpdf / (bpdf + lpdf);
+					if(mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
+						evalTerm *= mis;
 					L_emitter += evalTerm;
 				}
 			}
 		}
-
-		if (!L_bsdf.isValid()) std::cout << "Invalid bsdf radiance term" << std::endl;
-		if (!L_emitter.isValid()) std::cout << "Invalid emitter radiance term" << std::endl;
 		return L_bsdf + L_emitter;
 	}
 

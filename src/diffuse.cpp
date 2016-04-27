@@ -79,8 +79,7 @@ public:
 
         /* eval() / pdf() * cos(theta) = albedo. There
            is no need to call these functions. */
-        //return m_albedo;
-		return eval(bRec) / pdf(bRec);
+        return eval(bRec) / pdf(bRec);
     }
 
     bool isDiffuse() const {

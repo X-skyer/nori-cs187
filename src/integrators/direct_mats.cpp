@@ -44,6 +44,7 @@ public:
 			EmitterQueryRecord eRec;
 			eRec.ref = ray.o;
 			eRec.wi = ray.d;
+			eRec.n = its.geoFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
 			return e->eval(eRec);
 		}
@@ -66,7 +67,8 @@ public:
 			{
 				// Construct an emitter query record
 				EmitterQueryRecord eRec;
-				eRec.wi = bRec.wo;
+				eRec.wi = its.toWorld(bRec.wo);
+				eRec.n = s_isect.geoFrame.n;
 
 				// Get the radiance along the intersected direction
 				const Emitter* e = s_isect.mesh->getEmitter();

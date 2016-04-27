@@ -113,9 +113,27 @@ public:
 
 		bRec.measure = ESolidAngle;
 		
-		bRec.wo = Warp::squareToCosineHemisphere(_sample);
-		return eval(bRec) / pdf(bRec);		
+		// choose which lobe to sample
+		float fdec = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
+		float total_pdf = 0.0f;
+		if(fdec < m_ks)
+		{
+			bRec.wo = Warp::squareToCosineHemisphere(_sample);
+			float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			total_pdf = d_pdf;
+		}		
+		else
+		{
+			Normal3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
+			bRec.wo = (2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi).normalized();
+			float jacobian = 0.25f / (w_h.dot(bRec.wo));
+			float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			total_pdf = s_pdf;
+		}
 		
+		if (total_pdf != 0.0f)
+			return eval(bRec) / total_pdf;
+		else return 0.0f;		
     }
 
     virtual std::string toString() const {

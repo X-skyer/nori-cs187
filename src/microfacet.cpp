@@ -92,50 +92,50 @@ public:
 
 		Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 
-		return diffuse + specular;
+		return specular + diffuse;
 	}
 
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
-		// Only same hemisphere allowed.
-		if (bRec.wi.dot(bRec.wo) < 0.0f) return 0.0f;
+
+		if (Frame::cosTheta(bRec.wi) <= 0 || Frame::cosTheta(bRec.wo) <= 0)
+			return 0.0f;
 
 		// diffuse component
-		float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+		float d_pdf = (1.0f - m_ks) * INV_PI * Frame::cosTheta(bRec.wo);
 
 		// specular component
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
 		float jacobian = 0.25f / (w_h.dot(bRec.wo));
-		float s_pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * jacobian;
+		float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
 
-		return d_pdf + s_pdf;
+		return  s_pdf;
     }
 
     /// Sample the BRDF
     virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample, float optional_u) const {
+
+		if (Frame::cosTheta(bRec.wi) <= 0)
+			return Color3f(0.0f);
+
 		optional_u = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
+		/*
 		if(optional_u < m_ks)
 		{
 			// Sample diffuse lobe.
-			bRec.wo = Warp::squareToUniformHemisphere(_sample);
-			float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
-			return m_kd * INV_PI / d_pdf;
+			bRec.wo = Warp::squareToCosineHemisphere(_sample);
+			float d_pdf = (1.0f - m_ks) * INV_PI * Frame::cosTheta(bRec.wo);
+			return eval(bRec) / d_pdf;
 		}
-		else
+		else*/
 		{
 			// Sample the specular lobe.
 			Normal3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
 			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
 			float jacobian = 0.25f / (w_h.dot(bRec.wo));
-			float s_pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * jacobian;
-
-			float D = evalBeckmann(w_h);
-			float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
-			float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
-
-			Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
-
-			return specular / s_pdf;
+			float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			
+			return eval(bRec) / s_pdf;
 		}
     }
 

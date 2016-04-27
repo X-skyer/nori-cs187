@@ -101,15 +101,7 @@ public:
 		if (Frame::cosTheta(bRec.wi) <= 0 || Frame::cosTheta(bRec.wo) <= 0)
 			return 0.0f;
 
-		// diffuse component
-		float d_pdf = (1.0f - m_ks) * INV_PI * Frame::cosTheta(bRec.wo);
-
-		// specular component
-		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
-		float jacobian = 0.25f / (w_h.dot(bRec.wo));
-		float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
-
-		return  s_pdf;
+		return Warp::squareToCosineHemispherePdf(bRec.wo);
     }
 
     /// Sample the BRDF
@@ -118,25 +110,14 @@ public:
 		if (Frame::cosTheta(bRec.wi) <= 0)
 			return Color3f(0.0f);
 
-		optional_u = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
-		/*
-		if(optional_u < m_ks)
+		// choose which lobe to sample
+		float fdec = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
+		//if(fdec < m_ks)
 		{
-			// Sample diffuse lobe.
 			bRec.wo = Warp::squareToCosineHemisphere(_sample);
-			float d_pdf = (1.0f - m_ks) * INV_PI * Frame::cosTheta(bRec.wo);
-			return eval(bRec) / d_pdf;
+			return eval(bRec) / (Warp::squareToCosineHemispherePdf(bRec.wo));
 		}
-		else*/
-		{
-			// Sample the specular lobe.
-			Normal3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
-			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
-			float jacobian = 0.25f / (w_h.dot(bRec.wo));
-			float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
-			
-			return eval(bRec) / s_pdf;
-		}
+		
     }
 
     virtual std::string toString() const {

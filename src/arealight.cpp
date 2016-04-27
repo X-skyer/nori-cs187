@@ -37,22 +37,22 @@ public:
                 m_radiance.toString());
     }
 
+	// We don't assume anything about the visibility of points specified in 'ref' and 'p' in the EmitterQueryRecord.
 	virtual Color3f eval(const EmitterQueryRecord & lRec) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
 		// Return radiance only from the outside.
-		//if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
-		//else return 0.0f;
-		return m_radiance;
+		if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
+		else return 0.0f;
     }
 
-    virtual Color3f sample(EmitterQueryRecord & lRec, const Point2f & sample) const {
+    virtual Color3f sample(EmitterQueryRecord & lRec, const Point2f & sample, float optional_u) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
 		// Sample the underlying mesh for a position and normal.
-		m_mesh->samplePosition(sample, lRec.p, lRec.n);
+		m_mesh->samplePosition(sample, optional_u, lRec.p, lRec.n);
 
 		// Construct the EmitterQueryRecord structure.
 		lRec.wi = (lRec.p - lRec.ref).normalized();
@@ -62,7 +62,9 @@ public:
 
 		// convert pdf to solid angle measure
 		// pW = pA * r^2 / cos(theta)
-		float pW = pA * lRec.dist * lRec.dist / fabsf(lRec.n.dot(-lRec.wi));
+		Vector3f inv_wi = -lRec.wi;
+		float costheta_there = fabsf(lRec.n.dot(inv_wi));
+		float pW = pA * lRec.dist * lRec.dist / costheta_there;
 
 		if (pW < 0.0f)
 		{

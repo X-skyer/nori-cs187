@@ -49,10 +49,9 @@ void Mesh::activate() {
 	m_pdfs.normalize();
 }
 
-void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const
+void Mesh::samplePosition(const Point2f &sample, const float idsample, Point3f &p, Normal3f &n) const
 {
-	float rnd = sample.x() < 0.5f ? sample.x() * 2.0f : sample.x() * 2.0f - 1.0f;
-	auto id = m_pdfs.sample(rnd);
+	auto id = m_pdfs.sample(idsample);
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
 	const Point3f p0 = m_V.col(i0), p1 = m_V.col(i1), p2 = m_V.col(i2);

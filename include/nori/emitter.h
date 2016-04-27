@@ -86,11 +86,12 @@ public:
      *
      * \param lRec    An emitter query record (only ref is needed)
      * \param sample  A uniformly distributed sample on \f$[0,1]^2\f$
+	 * \param u       Another optional sample that might be used in some scenarios.
      *
      * \return The emitter value divided by the probability density of the sample.
      *         A zero value means that sampling failed.
      */
-    virtual Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample) const = 0;
+    virtual Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u = 0.0f) const = 0;
 
     /**
      * \brief Compute the probability of sampling \c lRec.p.

@@ -9,7 +9,7 @@ PointLight::PointLight(const PropertyList& prop)
 	m_type = EmitterType::EMITTER_POINT;
 }
 
-Color3f PointLight::sample(EmitterQueryRecord &lRec, const Point2f &sample) const
+Color3f PointLight::sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u) const
 {
 	// Explicit sampling of the point light.
 	lRec.p = m_position;

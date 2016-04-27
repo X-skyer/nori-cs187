@@ -17,7 +17,7 @@ public:
 	PointLight(const PropertyList& prop);
 
 	// Methods that have to be implemented for all types of emitters.
-	Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample) const;
+	Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u) const;
 
 	float pdf(const EmitterQueryRecord &lRec) const;
 

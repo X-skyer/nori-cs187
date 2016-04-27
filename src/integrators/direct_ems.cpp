@@ -42,8 +42,10 @@ public:
 		if (its.mesh->isEmitter())
 		{
 			EmitterQueryRecord eRec;
+			eRec.p = its.p;
 			eRec.ref = ray.o;
 			eRec.wi = ray.d;
+			eRec.n = its.geoFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
 			return e->eval(eRec);
 		}
@@ -59,13 +61,13 @@ public:
 			
 			// Get the incoming radiance and create shadow ray.
 			// Assume Li has the pdf included in it.
-			Color3f Li = e->sample(eRec, sampler->next2D());
+			Color3f Li = e->sample(eRec, sampler->next2D(), sampler->next1D());
 			const Ray3f shadow_ray(its.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist);
 			Intersection s_isect;
 			if (!scene->rayIntersect(shadow_ray, s_isect))
 			{
 				// If unoccluded to the light source, compute the lighting term and add contributions.
-				BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
+				BSDFQueryRecord bRec(its.toLocal(eRec.wi), its.toLocal(-ray.d), ESolidAngle);
 				Color3f evalTerm = bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 				if (!evalTerm.isValid())
 				{

@@ -21,7 +21,7 @@ DistantDisk::~DistantDisk()
 	// Empty destructor.
 }
 
-Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample) const
+Color3f DistantDisk::sample(EmitterQueryRecord & lRec, const Point2f & sample, float optional_u) const
 {
 	// Sample in local coordinate frame
 	Vector3f sampled_dir = Warp::squareToUniformSphereCap(sample, m_cosThetaMax);

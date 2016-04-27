@@ -18,7 +18,7 @@ public:
 
 	~DistantDisk();
 
-	Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample) const;
+	Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u) const;
 
 	float pdf(const EmitterQueryRecord &lRec) const;
 

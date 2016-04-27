@@ -98,6 +98,8 @@ public:
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
 		
+		if (Frame::cosTheta(bRec.wo) <= 0.0f || Frame::cosTheta(bRec.wi) <= 0.0f) return 0.0f;
+
 		float d_pdf = (1.0f - m_ks) + Warp::squareToCosineHemispherePdf(bRec.wo);
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
 		float jacobian = 0.25f / (w_h.dot(bRec.wo));
@@ -116,7 +118,7 @@ public:
 		// choose which lobe to sample
 		float fdec = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
 		float total_pdf = 0.0f;
-		if(fdec < m_ks)
+		if(optional_u < m_ks)
 		{
 			bRec.wo = Warp::squareToCosineHemisphere(_sample);
 			float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);

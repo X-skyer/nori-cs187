@@ -50,7 +50,7 @@ float DistantDisk::pdf(const EmitterQueryRecord & lRec) const
 Color3f DistantDisk::eval(const EmitterQueryRecord & lRec) const
 {
 	// Return radiance only if it's within the accepted limits.
-	Vector3f world_dir = -lRec.wi;
+	Vector3f world_dir = lRec.wi;
 	Vector3f local_dir = m_worldToLocal * world_dir;
 	float cos_theta = Frame::cosTheta(local_dir);
 	if (cos_theta >= m_cosThetaMax) return m_radiance;

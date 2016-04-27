@@ -88,7 +88,7 @@ public:
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
 		float D = evalBeckmann(w_h);
 		float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
-		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wi, w_h);
+		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
 
 		Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 
@@ -97,31 +97,45 @@ public:
 
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
+		// Only same hemisphere allowed.
+		if (bRec.wi.dot(bRec.wo) < 0.0f) return 0.0f;
+
+		// diffuse component
+		float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+
+		// specular component
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
-		return m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * (1.0f / (4 * w_h.dot(bRec.wo))) + (1.0f - m_ks) * Frame::cosTheta(bRec.wo) * INV_PI;
+		float jacobian = 0.25f / (w_h.dot(bRec.wo));
+		float s_pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * jacobian;
+
+		return d_pdf + s_pdf;
     }
 
     /// Sample the BRDF
     virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample, float optional_u) const {
-		if (optional_u < m_ks)
+		optional_u = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
+		if(optional_u < m_ks)
 		{
-			// Diffuse sampling.
-			bRec.wo = Warp::squareToCosineHemisphere(_sample);
-			float pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
-			return (m_kd * INV_PI) / pdf;
+			// Sample diffuse lobe.
+			bRec.wo = Warp::squareToUniformHemisphere(_sample);
+			float d_pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			return m_kd * INV_PI / d_pdf;
 		}
 		else
 		{
-			// Specular sampling.
-			Vector3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
-			bRec.wo = 2 * w_h.dot(bRec.wi) * w_h - bRec.wi;
+			// Sample the specular lobe.
+			Normal3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
+			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
+			float jacobian = 0.25f / (w_h.dot(bRec.wo));
+			float s_pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * jacobian;
+
 			float D = evalBeckmann(w_h);
 			float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
-			float G = smithBeckmannG1(bRec.wo, w_h) * smithBeckmannG1(bRec.wi, w_h);
+			float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
 
-			float pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * (1.0f / (4 * w_h.dot(bRec.wo)));
+			Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 
-			return (m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)))) / pdf;;
+			return specular / s_pdf;
 		}
     }
 

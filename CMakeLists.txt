@@ -73,8 +73,13 @@ add_executable(nori
   src/common.cpp
   src/diffuse.cpp
   src/directlightingintegrator.cpp
+  src/emitters/distantdisk.h
+  src/emitters/distantdisk.cpp
   src/gui.cpp
   src/independent.cpp
+  src/integrators/direct_ems.cpp
+  src/integrators/direct_mats.cpp
+  src/integrators/direct_mis.cpp
   src/main.cpp
   src/mesh.cpp
   src/normals.cpp

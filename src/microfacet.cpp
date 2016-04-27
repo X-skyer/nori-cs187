@@ -97,11 +97,12 @@ public:
 
     /// Evaluate the sampling density of \ref sample() wrt. solid angles
     virtual float pdf(const BSDFQueryRecord &bRec) const {
-
-		if (Frame::cosTheta(bRec.wi) <= 0 || Frame::cosTheta(bRec.wo) <= 0)
-			return 0.0f;
-
-		return Warp::squareToCosineHemispherePdf(bRec.wo);
+		
+		float d_pdf = (1.0f - m_ks) + Warp::squareToCosineHemispherePdf(bRec.wo);
+		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+		float jacobian = 0.25f / (w_h.dot(bRec.wo));
+		float s_pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+		return s_pdf + d_pdf;
     }
 
     /// Sample the BRDF
@@ -111,13 +112,9 @@ public:
 			return Color3f(0.0f);
 
 		bRec.measure = ESolidAngle;
-		// choose which lobe to sample
-		float fdec = _sample.x() < 0.5f ? _sample.x() * 2.0f : _sample.x() * 2.0f - 1.0f;
-		//if(fdec < m_ks)
-		{
-			bRec.wo = Warp::squareToCosineHemisphere(_sample);
-			return eval(bRec) / (Warp::squareToCosineHemispherePdf(bRec.wo));
-		}
+		
+		bRec.wo = Warp::squareToCosineHemisphere(_sample);
+		return eval(bRec) / pdf(bRec);		
 		
     }
 

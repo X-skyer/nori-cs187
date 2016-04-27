@@ -51,35 +51,48 @@ public:
 		// Else do brdf sampling.
 		Color3f Ld(0.0f);
 		const BSDF* bsdf = its.mesh->getBSDF();
-		//for (auto e : scene->getLights())
-		{
-			// Construct a BSDF query record
-			BSDFQueryRecord bRec(its.toLocal(-ray.d));
-			bRec.p = its.p;
+		
+		// Construct a BSDF query record
+		BSDFQueryRecord bRec(its.toLocal(-ray.d));
+		bRec.p = its.p;
 			
-			Color3f f = bsdf->sample(bRec, sampler->next2D());
-			float pdf_f = bsdf->pdf(bRec);
-			const Ray3f shadow_ray(its.p, its.toWorld(bRec.wi), Epsilon, INFINITY);
-			Intersection s_isect;
-			if (scene->rayIntersect(shadow_ray, s_isect))
+		Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
+		const Ray3f shadow_ray(its.p, its.toWorld(bRec.wo), Epsilon, INFINITY);
+		Intersection s_isect;
+		if (scene->rayIntersect(shadow_ray, s_isect))
+		{
+			// check if the intersected object was an emitter
+			if (s_isect.mesh->isEmitter())
 			{
-				// check if the intersected object was an emitter
-				if (s_isect.mesh->isEmitter())
+				// Construct an emitter query record
+				EmitterQueryRecord eRec;
+				eRec.wi = bRec.wo;
+
+				// Get the radiance along the intersected direction
+				const Emitter* e = s_isect.mesh->getEmitter();
+				Color3f Li = e->eval(eRec);
+
+				// Compute the direct lighting equation.
+				Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
+				if (!evalTerm.isValid())
 				{
-					// Construct an emitter query record
+					std::cout << "Invalid term" << std::endl;
+				}
+				Ld += evalTerm;
+			}
+		}
+		else
+		{
+			// Check if light is directional?
+			for (auto e : scene->getLights())
+			{
+				if (e->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
+				{
+					// get the distant light as of now and return the radiance for the direction
 					EmitterQueryRecord eRec;
-					eRec.wi = bRec.wi;
-
-					// Get the radiance along the intersected direction
-					const Emitter* e = s_isect.mesh->getEmitter();
+					eRec.wi = shadow_ray.d;
 					Color3f Li = e->eval(eRec);
-
-					// Compute the direct lighting equation.
-					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f) / pdf_f;
-					if (!evalTerm.isValid())
-					{
-						std::cout << "Invalid term" << std::endl;
-					}
+					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 					Ld += evalTerm;
 				}
 			}

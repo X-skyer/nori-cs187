@@ -29,10 +29,11 @@ NORI_NAMESPACE_BEGIN
  */
 struct BSDFQueryRecord {
     /// Incident direction (in the local frame)
+	/// Always the sampled direction
     Vector3f wi;
 
     /// Outgoing direction (in the local frame)
-    Vector3f wo;
+	Vector3f wo;
 
     /// Relative refractive index in the sampled direction
     float eta;
@@ -41,8 +42,8 @@ struct BSDFQueryRecord {
     EMeasure measure;
 
     /// Create a new record for sampling the BSDF
-    BSDFQueryRecord(const Vector3f &wi)
-        : wi(wi), measure(EUnknownMeasure) { }
+    BSDFQueryRecord(const Vector3f &wo)
+        : wi(wo), measure(EUnknownMeasure) { }
 
     /// Create a new record for querying the BSDF
     BSDFQueryRecord(const Vector3f &wi,
@@ -69,6 +70,7 @@ public:
      *
      * \param bRec    A BSDF query record
      * \param sample  A uniformly distributed sample on \f$[0,1]^2\f$
+	 * \param optional_u An optional sample used to sample a lobe in case of multi lobe bsdf
      *
      * \return The BSDF value divided by the probability density of the sample
      *         sample. The returned value also includes the cosine
@@ -76,7 +78,7 @@ public:
      *         when this is appropriate. A zero value means that sampling
      *         failed.
      */
-    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample) const = 0;
+    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample, float optional_u = 0.0f) const = 0;
 
     /**
      * \brief Evaluate the BSDF for a pair of directions and measure

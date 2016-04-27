@@ -42,7 +42,7 @@ public:
         return 0.0f;
     }
 
-    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample) const {
+    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample, float optional_u) const {
         throw NoriException("Unimplemented!");
     }
 

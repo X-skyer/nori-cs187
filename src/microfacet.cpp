@@ -81,6 +81,7 @@ public:
     }
 
     /// Evaluate the BRDF for the given pair of directions
+	/// Always assume that BSDFQueryRecord has directions in the local frame
 	virtual Color3f eval(const BSDFQueryRecord &bRec) const {
 		Color3f diffuse = m_kd * INV_PI;
 
@@ -101,23 +102,26 @@ public:
     }
 
     /// Sample the BRDF
-    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample) const {
-		if (_sample.x() < m_ks)
+    virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample, float optional_u) const {
+		if (optional_u < m_ks)
 		{
 			// Diffuse sampling.
 			bRec.wo = Warp::squareToCosineHemisphere(_sample);
-			return m_kd * INV_PI;
+			float pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			return (m_kd * INV_PI) / pdf;
 		}
 		else
 		{
 			// Specular sampling.
 			Vector3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
-			bRec.wi = 2 * w_h.dot(bRec.wo) * w_h - bRec.wo;
+			bRec.wo = 2 * w_h.dot(bRec.wi) * w_h - bRec.wi;
 			float D = evalBeckmann(w_h);
 			float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
 			float G = smithBeckmannG1(bRec.wo, w_h) * smithBeckmannG1(bRec.wi, w_h);
 
-			return m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+			float pdf = m_ks * evalBeckmann(w_h) * Frame::cosTheta(w_h) * (1.0f / (4 * w_h.dot(bRec.wo)));
+
+			return (m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)))) / pdf;;
 		}
     }
 

@@ -111,11 +111,11 @@ public:
 		else
 		{
 			// Specular sampling.
-			bRec.wo = Warp::squareToBeckmann(_sample, m_alpha);
-			Normal3f w_h = (bRec.wi + bRec.wo).normalized();
+			Vector3f w_h = Warp::squareToBeckmann(_sample, m_alpha);
+			bRec.wi = 2 * w_h.dot(bRec.wo) * w_h - bRec.wo;
 			float D = evalBeckmann(w_h);
 			float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
-			float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wi, w_h);
+			float G = smithBeckmannG1(bRec.wo, w_h) * smithBeckmannG1(bRec.wi, w_h);
 
 			return m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 		}

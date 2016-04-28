@@ -5,6 +5,7 @@
 /ext_build
 /build_xcode/
 /scenes/
+/scenes
 /build_vs2015/
 CMakeCache.txt
 CMakeFiles
@@ -24,5 +25,3 @@ rules.ninja
 Debug
 x64
 vs2013_x64/
-*.exr
-*.m

@@ -83,6 +83,10 @@ public:
     /// Evaluate the BRDF for the given pair of directions
 	/// Always assume that BSDFQueryRecord has directions in the local frame
 	virtual Color3f eval(const BSDFQueryRecord &bRec) const {
+
+		if (bRec.measure != ESolidAngle || Frame::cosTheta(bRec.wi) <= 0 || Frame::cosTheta(bRec.wo) <= 0)
+			return Color3f(0.0f);
+
 		Color3f diffuse = m_kd * INV_PI;
 
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
@@ -90,7 +94,7 @@ public:
 		float F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
 		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
 
-		Color3f specular = m_ks * F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+		Color3f specular = m_ks * F * D * G / (4 * (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 
 		return specular + diffuse;
 	}
@@ -113,6 +117,7 @@ public:
 		if (Frame::cosTheta(bRec.wi) <= 0)
 			return Color3f(0.0f);
 		
+		bRec.measure = ESolidAngle;
 		if (_sample.x() < m_ks)
 		{
 			float new_range_x = _sample.x() / m_ks;
@@ -122,16 +127,16 @@ public:
 			Normal3f w_h = Warp::squareToBeckmann(new_sample, m_alpha);
 			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
 			float jacobian = 0.25f / (w_h.dot(bRec.wo));
-			float pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
-			return eval(bRec) / pdf;
+			float _pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			return eval(bRec) / _pdf;
 		}
 		else
 		{
 			float new_range_x = (_sample.x() - m_ks) / (1.0f - m_ks);
 			Point2f new_sample(new_range_x, _sample.y());
 			bRec.wo = Warp::squareToCosineHemisphere(new_sample);
-			float pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
-			return eval(bRec) / pdf;
+			float _pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			return eval(bRec) / _pdf;
 		}
     }
 

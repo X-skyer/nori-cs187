@@ -132,6 +132,10 @@ public:
     virtual std::string toString() const;
 
     virtual EClassType getClassType() const { return EScene; }
+
+	//	Return the background color of the scene if the ray never intersected the scene or escaped the scene.
+	Color3f getBackground(const Ray3f& ray, const Point2f& sample, float& pdf) const;
+
 private:
     std::vector<Mesh *> m_meshes;
     std::vector<Emitter *> m_emitters;
@@ -139,7 +143,7 @@ private:
     Sampler *m_sampler = nullptr;
     Camera *m_camera = nullptr;
     BVH *m_bvh = nullptr;
-
+	Emitter* m_bgEmitter = nullptr;
 };
 
 NORI_NAMESPACE_END

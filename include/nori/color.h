@@ -75,6 +75,9 @@ public:
     /// Return the associated luminance
     float getLuminance() const;
 
+	/// Check if a zero color
+	bool isZero() const { return (x() == 0 && y() == 0 && z() == 0); }
+
     /// Return a human-readable string summary
     std::string toString() const {
         return tfm::format("[%f, %f, %f]", coeff(0), coeff(1), coeff(2));

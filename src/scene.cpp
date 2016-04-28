@@ -68,6 +68,10 @@ void Scene::addChild(NoriObject *obj) {
             break;
         
         case EEmitter:
+			// Add to the background emitter of the scene
+			// We know for a fact that there can be only one distant disk in a scene.
+			if (static_cast<Emitter*>(obj)->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
+				m_bgEmitter = static_cast<Emitter*>(obj);
             m_emitters.push_back(static_cast<Emitter *>(obj));
             break;
 
@@ -128,6 +132,18 @@ std::string Scene::toString() const {
         indent(meshes, 2),
         indent(lights,2)
     );
+}
+
+Color3f Scene::getBackground(const Ray3f& ray, const Point2f& sample) const
+{
+	if (m_bgEmitter != nullptr)
+	{
+		EmitterQueryRecord eRec;
+		eRec.p = ray.o;
+		return m_bgEmitter->sample(eRec, sample);		
+	}
+	else
+		return Color3f(0.0f);
 }
 
 NORI_REGISTER_CLASS(Scene, "scene");

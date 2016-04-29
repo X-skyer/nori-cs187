@@ -23,10 +23,7 @@ public:
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
-		{
-			float pdf;
 			return scene->getBackground(ray, sampler->next2D());
-		}
 
 		/* Intersection found */
 		// Check for intersection if a direct light source.
@@ -56,7 +53,7 @@ public:
 			
 			// Compute BSDF contribution for chosen direction.
 			BSDFQueryRecord bRec(its.toLocal(eRec.wi), its.toLocal(-ray.d), ESolidAngle);
-			Color3f evalTerm = bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
+			Color3f evalTerm = bsdf->eval(bRec) * Li * fabsf(its.shFrame.n.dot(eRec.wi));
 			
 			if (!evalTerm.isZero() && evalTerm.isValid())
 			{

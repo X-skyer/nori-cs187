@@ -140,7 +140,7 @@ Color3f Scene::getBackground(const Ray3f& ray, const Point2f& sample) const
 	{
 		EmitterQueryRecord eRec;
 		eRec.p = ray.o;
-		return m_bgEmitter->sample(eRec, sample);		
+		return m_bgEmitter->eval(eRec);
 	}
 	else
 		return Color3f(0.0f);

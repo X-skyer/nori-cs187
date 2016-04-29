@@ -132,6 +132,12 @@ public:
      */
     bool rayIntersect(uint32_t index, const Ray3f &ray, float &u, float &v, float &t) const;
 
+	// Computes a ray-mesh intersection test, returning the point to the nearest intersection on the mesh.
+	bool rayMeshIntersect(const Ray3f& ray, Intersection& isect) const;
+
+	// Computes a shadow ray mesh intersection test -> returns true on the first intersection found
+	bool rayMeshIntersectP(const Ray3f& ray) const;
+
     /// Return a pointer to the vertex positions
     const MatrixXf &getVertexPositions() const { return m_V; }
 

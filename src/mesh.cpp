@@ -121,6 +121,56 @@ bool Mesh::rayIntersect(uint32_t index, const Ray3f &ray, float &u, float &v, fl
     return t >= ray.mint && t <= ray.maxt;
 }
 
+bool Mesh::rayMeshIntersect(const Ray3f& ray, Intersection& isect) const
+{
+	float u, v, t;
+	float min_t = INFINITY, min_u = 0.0f, min_v = 0.0f;
+	int min_id = -1;
+	bool intersected = false;
+	for (auto i = 0; i < getTriangleCount(); i++)
+	{
+		if (rayIntersect(i, ray, u, v, t))
+		{
+			if (t < min_t)
+			{
+				min_id = i;
+				min_t = t;
+				min_u = u;
+				min_v = v;
+				intersected = true;
+			}
+		}
+	}
+
+	if (min_id != -1)
+	{
+		isect.p = ray(min_t);
+		isect.t = min_t;
+		isect.mesh = this;
+
+		// compose the normal for a frame
+		uint32_t i0 = m_F(0, min_id), i1 = m_F(1, min_id), i2 = m_F(2, min_id);
+		const Point3f p0 = m_V.col(i0), p1 = m_V.col(i1), p2 = m_V.col(i2);
+		Normal3f surface_normal = (p1 - p0).cross(p2 - p0).normalized();
+		isect.geoFrame = Frame(surface_normal);
+		isect.shFrame = isect.geoFrame;
+		isect.uv = Vector2f(min_u, min_v);
+	}
+
+	return intersected;
+}
+
+bool Mesh::rayMeshIntersectP(const Ray3f& ray) const
+{
+	float u, v, t;
+	for (auto i = 0; i < getTriangleCount(); i++)
+	{
+		if (rayIntersect(i, ray, u, v, t))
+			return true;
+	}
+	return false;
+}
+
 BoundingBox3f Mesh::getBoundingBox(uint32_t index) const {
     BoundingBox3f result(m_V.col(m_F(0, index)));
     result.expandBy(m_V.col(m_F(1, index)));

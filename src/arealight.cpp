@@ -42,8 +42,11 @@ public:
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-		// Return radiance only from the outside.
-		if (lRec.n.dot(lRec.wi) < 0.0f) return m_radiance;
+		// This function call can be done by bsdf sampling routines.
+		// Hence the ray was already traced for us - i.e a visibility test was already performed.
+		// Hence just check if the associated normal in emitter query record and incoming direction are not backfacing
+		if (lRec.n.dot(lRec.wi) < 0.0f)
+			return m_radiance;
 		else return 0.0f;
     }
 
@@ -58,35 +61,25 @@ public:
 		lRec.wi = (lRec.p - lRec.ref).normalized();
 		lRec.emitter = this;
 		lRec.dist = (lRec.p - lRec.ref).norm();
-		float pA = pdf(lRec);
-
-		// convert pdf to solid angle measure
-		// pW = pA * r^2 / cos(theta)
-		Vector3f inv_wi = -lRec.wi;
-		float costheta_there = fabsf(lRec.n.dot(inv_wi));
-		float pW = pA * lRec.dist * lRec.dist / costheta_there;
-		lRec.pdf = pW;
+		lRec.pdf = pdf(lRec);
 		
 		// Return the appropriately weighted radiance term back
-		if(lRec.pdf != 0.0f) return eval(lRec) / lRec.pdf;
+		// NOTE: We are not checking visibility here. It's the integrator's responsibility to check for the shadow ray test.
+		if(lRec.pdf != 0.0f) return m_radiance / lRec.pdf;
 		else return 0.0f;
     }
 
-	// Returns probability with respect to Area
+	// Returns probability with respect to solid angle given by all the information inside the emitterqueryrecord.
+	// Assumes all information about the intersection point is already provided inside.
+	// WARNING: Use with care. Malformed EmitterQueryRecords can result in undefined behavior. Plus no visibility is considered.
     virtual float pdf(const EmitterQueryRecord &lRec) const {
         if(!m_mesh)
             throw NoriException("There is no shape attached to this Area light!");
 
-		/*		Ray3f shadow_ray(lRec.ref, lRec.wi, Epsilon, (1.0f - Epsilon) * lRec.dist);
-		for (int i = 0; i < m_mesh->getTriangleCount(); i++)
-		{
-			float u, v, t;
-			if (m_mesh->rayIntersect(i, shadow_ray, u, v, t))
-				return m_mesh->pdf();
-		}
-		*/
-
-		return m_mesh->pdf();
+		Vector3f inv_wi = -lRec.wi;
+		float costheta_here = fabsf(lRec.n.dot(inv_wi));
+		float pW = m_mesh->pdf() * lRec.dist * lRec.dist / costheta_here;
+		return pW;
     }
 
 

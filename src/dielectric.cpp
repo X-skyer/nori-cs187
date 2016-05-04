@@ -67,9 +67,7 @@ public:
 		// TODO: handle it.
 		bRec.wo = -(eta1 / eta2) * (bRec.wi - n * bRec.wi.z()) - n * sqrt(1.0f - (square(eta1 / eta2) * (1.0f - square(bRec.wi.z()))));
 
-		Color3f ret = (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(cosThetaI);
-
-
+		return (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(cosThetaI);
     }
 
     virtual std::string toString() const {

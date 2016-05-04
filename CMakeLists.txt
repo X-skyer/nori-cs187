@@ -80,6 +80,8 @@ add_executable(nori
   src/integrators/direct_ems.cpp
   src/integrators/direct_mats.cpp
   src/integrators/direct_mis.cpp
+  src/integrators/path_mts.cpp
+  src/integrators/path_mis.cpp
   src/main.cpp
   src/mesh.cpp
   src/normals.cpp

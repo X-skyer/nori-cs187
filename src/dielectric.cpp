@@ -43,7 +43,33 @@ public:
     }
 
     virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample, float optional_u) const {
-        throw NoriException("Unimplemented!");
+		
+		// Compute the reflection coefficient.
+		float cosThetaI = Frame::cosTheta(bRec.wi);
+		float fR = fresnel(cosThetaI, m_extIOR, m_intIOR);
+
+		const Vector3f n(0, 0, 1.0f);
+
+		// Compute the transmitted direction.
+		float eta1 = m_extIOR;
+		float eta2 = m_intIOR;
+
+		// Check for correct internal and outer IORs
+		if (cosThetaI < 0.0f)
+			std::swap(eta1, eta2);
+
+		// Compute the refracted direction.
+		bRec.measure = EDiscrete;
+		bRec.eta = eta2;
+
+		// Compute refracted direction.
+		// There is a chance of total internal reflection.
+		// TODO: handle it.
+		bRec.wo = -(eta1 / eta2) * (bRec.wi - n * bRec.wi.z()) - n * sqrt(1.0f - (square(eta1 / eta2) * (1.0f - square(bRec.wi.z()))));
+
+		Color3f ret = (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(cosThetaI);
+
+
     }
 
     virtual std::string toString() const {

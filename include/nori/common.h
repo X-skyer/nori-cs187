@@ -271,6 +271,12 @@ extern float fresnel(float cosThetaI, float extIOR, float intIOR);
  */
 extern filesystem::resolver *getFileResolver();
 
+template<typename T>
+inline T square(T val) { return val * val; }
+
+template<typename T>
+inline T cubed(T val) { return square(val) * val; }
+
 NORI_NAMESPACE_END
 
 #endif /* __NORI_COMMON_H */

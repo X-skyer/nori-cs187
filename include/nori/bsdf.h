@@ -29,7 +29,6 @@ NORI_NAMESPACE_BEGIN
  */
 struct BSDFQueryRecord {
     /// Incident direction (in the local frame)
-	/// Always the sampled direction
     Vector3f wi;
 
     /// Outgoing direction (in the local frame)

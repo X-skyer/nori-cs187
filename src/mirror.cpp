@@ -51,7 +51,7 @@ public:
         /* Relative index of refraction: no change */
         bRec.eta = 1.0f;
 
-        return Color3f(1.0f);
+        return Color3f(1.0f) / Frame::cosTheta(bRec.wi);
     }
 
     virtual std::string toString() const {

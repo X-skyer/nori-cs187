@@ -93,7 +93,7 @@ void ImageBlock::fromBitmap(const Bitmap &bitmap) {
 void ImageBlock::put(const Point2f &_pos, const Color3f &value) {
     if (!value.isValid()) {
         /* If this happens, go fix your code instead of removing this warning ;) */
-        //cerr << "Integrator: computed an invalid radiance value: " << value.toString() << endl;
+        cerr << "Integrator: computed an invalid radiance value: " << value.toString() << endl;
         return;
     }
 

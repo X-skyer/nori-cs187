@@ -65,9 +65,10 @@ public:
 		// Compute refracted direction.
 		// There is a chance of total internal reflection.
 		// TODO: handle it.
+		if (fR == 1.0f)
+			return 0.0f;
 		bRec.wo = -(eta1 / eta2) * (bRec.wi - n * bRec.wi.z()) - n * sqrt(1.0f - (square(eta1 / eta2) * (1.0f - square(bRec.wi.z()))));
-
-		return (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(cosThetaI);
+		return (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(Frame::cosTheta(bRec.wo));		
     }
 
     virtual std::string toString() const {

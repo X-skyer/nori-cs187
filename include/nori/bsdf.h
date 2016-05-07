@@ -23,6 +23,14 @@
 
 NORI_NAMESPACE_BEGIN
 
+enum class BsdfType
+{
+	BSDF_DIFFUSE,
+	BSDF_MIRROR,
+	BSDF_DIELECTRIC,
+	BSDF_MICROFACET
+};
+
 /**
  * \brief Convenience data structure used to pass multiple
  * parameters to the evaluation and sampling routines in \ref BSDF
@@ -119,6 +127,8 @@ public:
      * or not to store photons on a surface
      */
     virtual bool isDiffuse() const { return false; }
+
+	BsdfType m_type;
 };
 
 NORI_NAMESPACE_END

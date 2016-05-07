@@ -29,6 +29,7 @@ class Diffuse : public BSDF {
 public:
     Diffuse(const PropertyList &propList) {
         m_albedo = propList.getColor("albedo", Color3f(0.5f));
+		m_type = BsdfType::BSDF_DIFFUSE;
     }
 
     /// Evaluate the BRDF model

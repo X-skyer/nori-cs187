@@ -30,6 +30,8 @@ public:
 
         /* Exterior IOR (default: air) */
         m_extIOR = propList.getFloat("extIOR", 1.000277f);
+
+		m_type = BsdfType::BSDF_DIELECTRIC;
     }
 
     virtual Color3f eval(const BSDFQueryRecord &) const {

@@ -46,6 +46,8 @@ public:
            interested in implementing a more realistic version 
            of this BRDF. */
         m_ks = 1 - m_kd.maxCoeff();
+
+		m_type = BsdfType::BSDF_MICROFACET;
     }
 
     /// Evaluate the microfacet normal distribution D

@@ -34,56 +34,67 @@ public:
 	// return appropriately weighted terms.
 	Color3f LiDirect(const Scene* scene, Sampler* sampler, const Ray3f& ray, const Intersection& isect) const
 	{
-		Color3f L_ems(0.0f), L_mats(0.0f);
-		float mis_w_ems = 0.0f, mis_w_mats = 0.0f;			// mis weights
-
+		Color3f L_ems(0.0f), L_mats(0.0f);		
 		const BSDF* bsdf = isect.mesh->getBSDF();
+
+		// Choose a light
+		float pdf = 1.0f / scene->getLights().size();
+		const Emitter* random_emitter = scene->getRandomEmitter(sampler->next1D());
 
 		// Emitter Sampling
 		// Perform only if not a delta bsdf
 		if(!bsdf->isDelta())
 		{
-			float pdf = 1.0f / scene->getLights().size();
-			const Emitter* random_emitter = scene->getRandomEmitter(sampler->next1D());
-
 			EmitterQueryRecord eRec;
 			float pdf_e, pdf_m;
 			eRec.ref = isect.p;
 
 			Color3f Li = random_emitter->sample(eRec, sampler->next2D());
-			pdf_e = random_emitter->pdf(eRec);
-
+			pdf_e = eRec.pdf;
+			
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d), isect.toLocal(eRec.wi), ESolidAngle);
 			Color3f f = bsdf->eval(bRec);
 			pdf_m = bsdf->pdf(bRec);
-
-			float mis = pdf_e / (pdf_m + pdf_e);
-			
-			Color3f L_ems = f * Li * fabsf(Frame::cosTheta(eRec.wi)) * mis;
-
-			if (L_ems.isValid() && !L_ems.isZero())
+			if (pdf_e != 0.0f)
 			{
-				// Trace a shadow ray only now
-				float V = scene->rayIntersect(Ray3f(isect.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist)) ? 0.0f : 1.0f;
-				L_ems *= V;
-			}
-			else
-				L_ems = Color3f(0.0f);
+				float mis = pdf_e / (pdf_m + pdf_e);
+
+				// Compute lighting
+				L_ems = f * Li * fabsf(isect.shFrame.n.dot(eRec.wi)) / pdf;
+
+				// Compute shadow ray only when 
+				if (L_ems.isValid() && !L_ems.isZero())
+				{
+					// Trace a shadow ray only now
+					float V = scene->rayIntersect(Ray3f(isect.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist)) ? 0.0f : 1.0f;
+					L_ems *= V;
+				}
+				else
+					L_ems = Color3f(0.0f);
+
+
+				if (!random_emitter->isDelta())
+				{
+					// The BSDF has no way of generating a direction that would hit this light
+					// Hence multiply by MIS value only when 
+					L_ems *= mis;
+				}				
+			}			
 		}
-
-
+		
 		// BSDF sampling
 		// If there were only one light and that light was a delta light, we can't do this kind of sampling.
 		if (!(scene->getLights().size() == 1 && scene->getLights()[0]->isDelta()))
 		{
+			
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d));
 			Color3f f = bsdf->sample(bRec, sampler->next2D());
-			float pdf_m = bsdf->pdf(bRec);
-			
-			if (!f.isZero() && pdf_m != 0.0f & !isnan(pdf_m))
+			float pdf_m = bRec.pdf;
+
+			if (!f.isZero() && pdf_m != 0.0f && !isnan(pdf_m))
 			{
 				Intersection light_isect;
-				if (scene->rayIntersect(Ray3f(isect.p, isect.toWorld(bRec.wo), Epsilon, INFINITY)))
+				if (scene->rayIntersect(Ray3f(isect.p, isect.toWorld(bRec.wo), Epsilon, INFINITY), light_isect))
 				{
 					// check if a light soruce
 					if (light_isect.mesh->isEmitter())
@@ -93,21 +104,28 @@ public:
 						EmitterQueryRecord eRec;
 						eRec.ref = isect.p;
 						eRec.wi = isect.toWorld(bRec.wo);
-						eRec.n = light_isect.geoFrame.n;
+						eRec.n = light_isect.shFrame.n;
 						eRec.emitter = light;
 						eRec.p = light_isect.p;
 						eRec.dist = light_isect.t;
 
 						Color3f Li = light->eval(eRec);
-						float pdf_e = light->pdf(eRec);
-						float mis = pdf_m / (pdf_m + pdf_e);
+						float mis = 1.0f;
 
-						L_mats += (f * Li * fabsf(Frame::cosTheta(bRec.wo)));
+						// If the BSDF was delta, the light could have never generated this reverse direction
+						if (!bsdf->isDelta())
+						{
+							float pdf_e = light->pdf(eRec);
+							mis = pdf_m / (pdf_m + pdf_e);
+						}
+
+						L_mats += (f * Li * fabsf(Frame::cosTheta(bRec.wo))) * mis;
 					}
 				}
 			}
-			
 		}
+
+
 		return L_ems + L_mats;
 	}
 
@@ -134,7 +152,7 @@ public:
 			// Check if direct emitter intersection
 			// return this only if direct hit or previous hit was from a specular surface
 			// because we couldnt have sampled it using a light sampling strategy.
-			if (isect.mesh->isEmitter() && (depth == 0 || wasLastBounceSpecular))
+			if (isect.mesh->isEmitter() && (depth == 0 || !wasLastBounceSpecular))
 			{
 				EmitterQueryRecord eRec;
 				eRec.ref = traced_ray.o;
@@ -199,5 +217,5 @@ private:
 
 };
 
-NORI_REGISTER_CLASS(PathIntegratorMis, "path_mis");
+NORI_REGISTER_CLASS(PathIntegratorMis, "path_mis")
 NORI_NAMESPACE_END

@@ -43,6 +43,7 @@ public:
 
 		// Emitter Sampling
 		// Perform only if not a delta bsdf
+		
 		if(!bsdf->isDelta())
 		{
 			EmitterQueryRecord eRec;

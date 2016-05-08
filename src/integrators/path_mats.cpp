@@ -5,17 +5,16 @@
 
 NORI_NAMESPACE_BEGIN
 
-class PathIntegratorMts : public Integrator
+class PathIntegratorMats : public Integrator
 {
 public:
-
-	PathIntegratorMts(const PropertyList& props)
+	PathIntegratorMats(const PropertyList& props)
 	{
 		m_rrStart = props.getInteger("rrStart", 5);
 		m_maxDepth = props.getInteger("maxDepth", -1);
 	}
 
-	~PathIntegratorMts() {}
+	~PathIntegratorMats() {}
 
 	Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &ray) const
 	{
@@ -48,7 +47,7 @@ public:
 				break;
 			}
 
-			const BSDF* bsdf = isect.mesh->getBSDF();			
+			const BSDF* bsdf = isect.mesh->getBSDF();
 
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
@@ -58,7 +57,7 @@ public:
 			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));
 			throughput *= f * cos_theta;
 
-			// Check if we've reached a zero throughput. No point in proceeding further.
+			// Check if we've fa
 			if (throughput.isZero())
 				break;
 
@@ -79,20 +78,21 @@ public:
 			traced_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
 			depth++;
 		}
-		
+
 		return L;
 	}
 
 	std::string toString() const
 	{
-		return tfm::format("PathIntegratorMts[\nrrStart = %d\n]", m_rrStart);
+		return tfm::format("PathIntegratorMats[\nrrStart = %d\n]", m_rrStart);
 	}
 
 private:
 	int m_rrStart;				// from which bounce should russian roulette start.
 	int m_maxDepth;				// Fixed length cutoff
 
+
 };
 
-NORI_REGISTER_CLASS(PathIntegratorMts, "path_mats");
+NORI_REGISTER_CLASS(PathIntegratorMats, "path_mats")
 NORI_NAMESPACE_END

@@ -58,7 +58,7 @@ public:
 			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));
 			throughput *= f * cos_theta;
 
-			// Check if we've fa
+			// Check if we've reached a zero throughput. No point in proceeding further.
 			if (throughput.isZero())
 				break;
 

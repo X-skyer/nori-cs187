@@ -91,10 +91,13 @@ public:
      * \brief Uniformly sample a position on the mesh with
      * respect to surface area. Returns both position and normal
      */
-    void samplePosition(const Point2f &sample, const float u, Point3f &p, Normal3f &n) const;
+    void samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const;
 
 	/// Return the surface area of the given triangle
     float surfaceArea(uint32_t index) const;
+
+	/// Return total surface aea
+	float totalSurfaceArea() const { return m_totalSurfaceArea; }
 
     //// Return an axis-aligned bounding box of the entire mesh
     const BoundingBox3f &getBoundingBox() const { return m_bbox; }

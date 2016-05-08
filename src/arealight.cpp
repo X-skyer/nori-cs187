@@ -55,7 +55,7 @@ public:
             throw NoriException("There is no shape attached to this Area light!");
 
 		// Sample the underlying mesh for a position and normal.
-		m_mesh->samplePosition(sample, optional_u, lRec.p, lRec.n);
+		m_mesh->samplePosition(sample, lRec.p, lRec.n);
 
 		// Construct the EmitterQueryRecord structure.
 		lRec.wi = (lRec.p - lRec.ref).normalized();
@@ -86,7 +86,29 @@ public:
 
 
     virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2) const {
-        throw NoriException("To implement...");
+		if (!m_mesh)
+			throw NoriException("There is no shape attached to this area light");
+
+		// global pdf
+		float _pdf = 0.0f;
+
+		// Sample a point to emit from the mesh
+		EmitterQueryRecord eRec;
+		m_mesh->samplePosition(sample1, eRec.p, eRec.n);
+		
+		// Sample a direction
+		Vector3f wi = Warp::squareToCosineHemisphere(sample2);
+
+		Frame my_frame(eRec.n);
+		Vector3f xfm_wi = my_frame.toWorld(wi);
+
+		_pdf = (1.0f / m_mesh->pdf()) * (Warp::squareToCosineHemispherePdf(wi));
+
+		// Get the ray out.
+		ray = Ray3f(eRec.p, xfm_wi, Epsilon, INFINITY);
+
+		// Return power
+		return M_PI * m_mesh->totalSurfaceArea() * m_radiance;
     }
 
 	// Get the parent mesh

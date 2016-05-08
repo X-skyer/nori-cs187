@@ -84,6 +84,12 @@ public:
     
     Vector3f getDirection() const { return data.getDirection(); }
     Color3f getPower() const { return data.getPower(); }
+	
+	Photon operator/ (float k) const { 
+		Color3f scaled_power = (this->getPower()) / k;
+		Photon ret(this->getPosition(), this->getDirection(), scaled_power);
+		return ret;
+	}
 };
 
 NORI_NAMESPACE_END

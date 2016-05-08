@@ -52,7 +52,7 @@ void Mesh::activate() {
 void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const
 {
 
-	auto id = m_pdfs.sample(sample.x);
+	auto id = m_pdfs.sample(sample.x());
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
 	// barycentric sampling of triangle.

@@ -433,6 +433,11 @@ public:
         return nnSearch(p, searchRadiusSqr, k, results);
     }
 
+	void scale(float factor)
+	{
+		std::for_each(m_nodes.begin(), m_nodes.end(), [=](auto& val) { val = val / factor; });
+	}
+
 protected:
     /// Return whether or not the inner node of the specified index has a right child node.
     bool hasRightChild(IndexType index) const {

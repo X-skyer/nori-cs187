@@ -32,7 +32,7 @@ public:
 
     PhotonMapper(const PropertyList &props) {
         /* Lookup parameters */
-        m_photonCount  = props.getInteger("photonCount", 1000000);
+        m_photonCount  = props.getInteger("photonCount", 1000);
         m_photonRadius = props.getFloat("photonRadius", 0.0f /* Default: automatic */);
 		m_rrStart = props.getInteger("rrStart", 5);
 		m_maxDepth = props.getInteger("maxDepth", -1);
@@ -154,6 +154,9 @@ public:
 			}
 		}
 
+		// Divide all photons by the total emitted
+		m_photonMap->scale(emitted_photons);
+
 		/* Build the photon map */
         m_photonMap->build();
     }
@@ -176,9 +179,85 @@ public:
 	 */
 
 	// put your code for path tracing with photon gathering here
+
+		Color3f L(0.0f);
+		Color3f throughput(1.0f);
+		int depth = 0;
+		Intersection isect;
+		bool bLastBounceWasSpecular = false;
+		Ray3f traced_ray = _ray;
+
+		while (depth < m_maxDepth || m_maxDepth == -1)
+		{
+			if (!scene->rayIntersect(traced_ray, isect))
+				return scene->getBackground(traced_ray, sampler->next2D());
+
+			if (isect.mesh->isEmitter())
+			{
+				EmitterQueryRecord eRec;
+				eRec.ref = traced_ray.o;
+				eRec.wi = traced_ray.d;
+				eRec.n = isect.shFrame.n;
+				L += throughput * isect.mesh->getEmitter()->eval(eRec);
+
+				// Assume for now we dont bounce off the light sources.
+				break;
+			}
+
+			const BSDF* bsdf = isect.mesh->getBSDF();
+
+			// Compute indirect contribution only from diffuse surfaces
+			if (bsdf->isDiffuse())
+			{
+				std::vector<uint32_t> results;
+				m_photonMap->search(isect.p, m_photonRadius, results);
+				float area = M_PI * square(m_photonRadius);
+
+				for (uint32_t i : results)
+				{
+					const Photon &photon = (*m_photonMap)[i];
+					
+					// Compute the integral equation
+					BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d), isect.toLocal(-photon.getDirection()), ESolidAngle);
+
+					L += bsdf->eval(bRec) * photon.getPower() / area;
+				}
+
+				// Immediately stop recursion
+				break;
+			}
+
+			// Sample a reflection ray
+			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
+			Color3f f = bsdf->sample(bRec, sampler->next2D());
+			Vector3f reflected_dir = isect.toWorld(bRec.wo);
+
+			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));
+			throughput *= f * cos_theta;
+
+			// Check if we've fa
+			if (throughput.isZero())
+				break;
+
+			// Check for russian roulette
+			if (depth > m_rrStart)
+			{
+				if (sampler->next1D() < 0.5f)
+					break;
+				else throughput *= 2.0f;
+			}
+			else if (depth > m_maxDepth && m_maxDepth != -1)
+			{
+				// forcibly terminate
+				break;
+			}
+
+			// Propogate
+			traced_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
+			depth++;
+		}
     
-		Color3f CHANGEME(1.0f, 0.0f, 0.0f);
-		return CHANGEME;
+		return L;
     }
 
     virtual std::string toString() const {

@@ -277,6 +277,15 @@ inline T square(T val) { return val * val; }
 template<typename T>
 inline T cubed(T val) { return square(val) * val; }
 
+// This is the special function that gives two random numbers from one random number based on the cutoff value
+inline float twoRandsFromOne(float input, float cutoff)
+{
+	if (input < cutoff)
+		return input / cutoff;
+	else
+		return (input - cutoff) / (1.0f - cutoff);
+}
+
 NORI_NAMESPACE_END
 
 #endif /* __NORI_COMMON_H */

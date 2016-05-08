@@ -128,6 +128,8 @@ public:
      */
     virtual bool isDiffuse() const { return false; }
 
+	bool isDelta() const { return m_type == BsdfType::BSDF_MIRROR || m_type == BsdfType::BSDF_DIELECTRIC; }
+
 	BsdfType m_type;
 };
 

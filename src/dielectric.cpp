@@ -46,31 +46,57 @@ public:
 
     virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &sample, float optional_u) const {
 		
-		// Compute the reflection coefficient.
-		float cosThetaI = Frame::cosTheta(bRec.wi);
-		float fR = fresnel(cosThetaI, m_extIOR, m_intIOR);
+		float Fr = fresnel(Frame::cosTheta(bRec.wi), m_extIOR, m_intIOR);
 
-		const Vector3f n(0, 0, 1.0f);
+		// check if reflection or refraction
+		if (sample.x() < Fr)
+		{
+			bRec.wo = Vector3f(
+				-bRec.wi.x(),
+				-bRec.wi.y(),
+				bRec.wi.z()
+			);
+			bRec.measure = EDiscrete;
 
-		// Compute the transmitted direction.
-		float eta1 = m_extIOR;
-		float eta2 = m_intIOR;
+			/* Relative index of refraction: no change */
+			bRec.eta = 1.0f;
 
-		// Check for correct internal and outer IORs
-		if (cosThetaI < 0.0f)
-			std::swap(eta1, eta2);
+			// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
+			return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
+		}
+		else
+		{
+			// do refraction
+			bool entering = Frame::cosTheta(bRec.wi) > 0.0f;
+			float eta_i = m_extIOR;
+			float eta_t = m_intIOR;
+			if (!entering)
+				std::swap(eta_i, eta_t);
 
-		// Compute the refracted direction.
-		bRec.measure = EDiscrete;
-		bRec.eta = eta2;
+			// Compute transmitted direction
+			float sini2 = 1.0f - (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wi));
+			float eta = eta_i / eta_t;
+			float sint2 = eta * eta * sini2;
 
-		// Compute refracted direction.
-		// There is a chance of total internal reflection.
-		// TODO: handle it.
-		if (fR == 1.0f)
-			return 0.0f;
-		bRec.wo = -(eta1 / eta2) * (bRec.wi - n * bRec.wi.z()) - n * sqrt(1.0f - (square(eta1 / eta2) * (1.0f - square(bRec.wi.z()))));
-		return (square(eta1) / square(eta2)) * (1.0f - fR) / fabsf(Frame::cosTheta(bRec.wo));		
+			if (sint2 >= 1.0f)
+			{
+				bRec.wi = Vector3f(0.0f);
+				return 0.0f;
+			}
+
+			float cost = sqrtf(std::max(0.0f, 1.0f - sint2));
+			if (entering) cost = -cost;
+			float sintOverSini = eta;
+
+			// Set all the values
+			bRec.wo = Vector3f(sintOverSini * -bRec.wi.x(), sintOverSini * -bRec.wi.y(), cost);
+			bRec.eta = eta_t;
+			bRec.measure = EDiscrete;
+
+			// The (1-fr) term disappears because the probability of sampling this refraction is also (1-fr)
+			// Hence the numerator term and the denominator term cancel out.
+			return (square(eta_t) / square(eta_i)) / (fabsf(Frame::cosTheta(bRec.wo)));
+		}
     }
 
     virtual std::string toString() const {

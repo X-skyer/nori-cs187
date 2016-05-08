@@ -63,6 +63,9 @@ struct BSDFQueryRecord {
     Point2f uv;
     /// Point associated with the point
     Point3f p;
+
+	/// pdf associated with this sample
+	float pdf;
 };
 
 /**

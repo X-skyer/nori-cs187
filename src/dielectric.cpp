@@ -92,6 +92,7 @@ public:
 			bRec.wo = Vector3f(sintOverSini * -bRec.wi.x(), sintOverSini * -bRec.wi.y(), cost);
 			bRec.eta = eta_t;
 			bRec.measure = EDiscrete;
+			bRec.pdf = 1.0f;
 
 			// The (1-fr) term disappears because the probability of sampling this refraction is also (1-fr)
 			// Hence the numerator term and the denominator term cancel out.

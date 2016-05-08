@@ -129,7 +129,10 @@ public:
 			Normal3f w_h = Warp::squareToBeckmann(new_sample, m_alpha);
 			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
 			float jacobian = 0.25f / (w_h.dot(bRec.wo));
-			float _pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			//float _pdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+			float _pdf = pdf(bRec);
+			bRec.pdf = _pdf;
+
 			return eval(bRec) / _pdf;
 		}
 		else
@@ -137,7 +140,9 @@ public:
 			float new_range_x = (_sample.x() - m_ks) / (1.0f - m_ks);
 			Point2f new_sample(new_range_x, _sample.y());
 			bRec.wo = Warp::squareToCosineHemisphere(new_sample);
-			float _pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			//float _pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
+			float _pdf = pdf(bRec);
+			bRec.pdf = _pdf;
 			return eval(bRec) / _pdf;
 		}
     }

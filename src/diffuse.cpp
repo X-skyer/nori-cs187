@@ -77,6 +77,7 @@ public:
 
         /* Relative index of refraction: no change */
         bRec.eta = 1.0f;
+		bRec.pdf = pdf(bRec);
 
         /* eval() / pdf() * cos(theta) = albedo. There
            is no need to call these functions. */

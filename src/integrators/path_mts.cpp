@@ -48,35 +48,14 @@ public:
 				break;
 			}
 
-			// Else do NEE first
-			const BSDF* bsdf = isect.mesh->getBSDF();
-
-			/*
-			EmitterQueryRecord eRec;
-			
-			// Sample one light among many.
-			float pdf = 1.0f / scene->getLights().size();
-			const Emitter* random_emitter = scene->getRandomEmitter(sampler->next1D());
-
-			eRec.ref = isect.p;
-			Color3f L_sampled_incoming = random_emitter->sample(eRec, sampler->next2D());
-			pdf *= random_emitter->pdf(eRec);
-
-			// Evalute the rendering equation
-			Color3f partial_eval = bsdf->eval(BSDFQueryRecord(isect.toLocal(-traced_ray.d), isect.toLocal(eRec.wi), ESolidAngle)) * L_sampled_incoming * fmaxf(isect.shFrame.n.dot(eRec.wi), 0.0f) / pdf;
-			if (pdf != 0.0f && !partial_eval.isZero())
-			{
-				float V = scene->rayIntersect(Ray3f(isect.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist)) ? 0.0f : 1.0f;
-				L += throughput * partial_eval * V;
-			}
-			*/
+			const BSDF* bsdf = isect.mesh->getBSDF();			
 
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
 			Color3f f = bsdf->sample(bRec, sampler->next2D());
 			Vector3f reflected_dir = isect.toWorld(bRec.wo);
-			
-			float cos_theta = fabsf(isect.geoFrame.n.dot(reflected_dir));
+
+			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));
 			throughput *= f * cos_theta;
 
 			// Check if we've fa

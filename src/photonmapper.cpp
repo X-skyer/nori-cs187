@@ -34,6 +34,8 @@ public:
         /* Lookup parameters */
         m_photonCount  = props.getInteger("photonCount", 1000000);
         m_photonRadius = props.getFloat("photonRadius", 0.0f /* Default: automatic */);
+		m_rrStart = props.getInteger("rrStart", 5);
+		m_maxDepth = props.getInteger("maxDepth", -1);
     }
 
     virtual void preprocess(const Scene *scene) {
@@ -52,6 +54,18 @@ public:
 		if (m_photonRadius == 0)
 			m_photonRadius = scene->getBoundingBox().getExtents().norm() / 500.0f;
 
+		bool bAreaLightPresent = false;
+		for (auto e : scene->getLights())
+		{
+			if (e->getEmitterType() == EmitterType::EMITTER_AREA)
+			{
+				bAreaLightPresent = true;
+				break;
+			}
+		}
+
+		if (!bAreaLightPresent)
+			throw NoriException("No Area lights present to shoot photons");
 	
 
         /* How to add a photon?
@@ -63,9 +77,82 @@ public:
 	 */
 
 	// put your code to trace photons here
+		int stored_photons = 0;
+		int emitted_photons = 0;
+		while (stored_photons < m_photonCount)
+		{
+			// First choose a light
+			const Emitter* emitter = scene->getRandomEmitter(sampler->next1D());
 
+			if (emitter->getEmitterType() == EmitterType::EMITTER_AREA)
+			{
+				Ray3f photon_ray;
+				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D());
+				if (!photon_power.isZero())
+				{
+					emitted_photons++;			// keep track of how many photons we shot to divide the contrib of all stored photons finally
 
+					// start the trace of the photon
+					Intersection isect;
+					int depth = 0;
+					while (depth < m_maxDepth || m_maxDepth == -1)
+					{
+						// Check for intersection
+						// If not intersection, don't do anything
+						if (!scene->rayIntersect(photon_ray, isect))
+						{
+							// This photon was waste. So we are not going to use it at all.
+							// So negate it.
+							emitted_photons--;
+							break;
+						}
 
+						const BSDF* bsdf = isect.mesh->getBSDF();
+						if (isect.mesh->isEmitter())
+						{
+							if (depth == 0) { emitted_photons--; }
+							break;
+						}
+
+						if (!bsdf->isDelta())
+						{
+							// Store photon
+							m_photonMap->push_back(Photon(isect.p, photon_ray.d, photon_power));
+							stored_photons++;
+						}
+
+						// Now sample next direction
+						BSDFQueryRecord bRec(isect.toLocal(-photon_ray.d));
+						Color3f f = bsdf->sample(bRec, sampler->next2D());
+						Vector3f reflected_dir = isect.toWorld(bRec.wo);
+
+						//update the photon power
+						// pdf is included in the f term
+						photon_power *= f * fabsf(Frame::cosTheta(bRec.wo));
+
+						// Check for zero bsdf
+						if (f.isZero())
+							break;
+
+						// Check for russian roulette
+						if (depth > m_rrStart)
+						{
+							if (sampler->next1D() < 0.5f)
+								break;
+							else photon_power *= 2.0f;
+						}
+						if (depth > m_maxDepth && m_maxDepth != -1)
+						{
+							break;
+						}
+
+						// Generate the next bounce direction
+						photon_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
+						depth++;
+					}
+				}
+			}
+		}
 
 		/* Build the photon map */
         m_photonMap->build();
@@ -107,6 +194,8 @@ public:
 private:
     int m_photonCount;
     float m_photonRadius;
+	int m_rrStart;
+	int m_maxDepth;
     std::unique_ptr<PhotonMap> m_photonMap;
 };
 

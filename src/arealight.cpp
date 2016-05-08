@@ -65,7 +65,7 @@ public:
 		
 		// Return the appropriately weighted radiance term back
 		// NOTE: We are not checking visibility here. It's the integrator's responsibility to check for the shadow ray test.
-		if(lRec.pdf != 0.0f) return m_radiance / lRec.pdf;
+		if(lRec.pdf != 0.0f || fabsf(lRec.pdf) != INFINITY) return m_radiance / lRec.pdf;
 		else return 0.0f;
     }
 
@@ -79,6 +79,8 @@ public:
 		Vector3f inv_wi = -lRec.wi;
 		float costheta_here = fabsf(lRec.n.dot(inv_wi));
 		float pW = m_mesh->pdf() * lRec.dist * lRec.dist / costheta_here;
+		if (isnan(pW) || fabsf(pW) == INFINITY)
+			return 0.0f;
 		return pW;
     }
 

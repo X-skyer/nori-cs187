@@ -20,6 +20,9 @@ public:
 
 	Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &ray) const
 	{
+		// Else do light sampling.
+		Color3f Ld(0.0f);
+
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
@@ -35,11 +38,9 @@ public:
 			eRec.wi = ray.d;
 			eRec.n = its.geoFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
-			return e->eval(eRec);
+			Ld += e->eval(eRec);
 		}
-
-		// Else do light sampling.
-		Color3f Ld(0.0f);
+		
 		const BSDF* bsdf = its.mesh->getBSDF();
 		for (auto e : scene->getLights())
 		{

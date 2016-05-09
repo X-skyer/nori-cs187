@@ -38,6 +38,8 @@ public:
 		}
 
 		/* Intersection found */
+		Color3f Ld(0.0f);
+
 		// Check for intersection if a direct light source.
 		if (its.mesh->isEmitter())
 		{
@@ -46,11 +48,10 @@ public:
 			eRec.wi = ray.d;
 			eRec.n = its.geoFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
-			return e->eval(eRec);
+			Ld += e->eval(eRec);
 		}
 
-		// Else do brdf sampling.
-		Color3f Ld(0.0f);
+		// Do brdf sampling.		
 		const BSDF* bsdf = its.mesh->getBSDF();
 		
 		// Construct a BSDF query record

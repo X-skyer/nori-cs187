@@ -52,6 +52,7 @@ add_executable(nori
   include/nori/integrator.h
   include/nori/mesh.h
   include/nori/object.h
+  include/nori/optionsparser.h
   include/nori/parser.h
   include/nori/pointlight.h
   include/nori/proplist.h

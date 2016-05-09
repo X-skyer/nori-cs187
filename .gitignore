@@ -5,12 +5,13 @@
 /ext_build
 /build_xcode/
 /scenes/
-/scenes
+/scenes/
 /build_vs2015/
 CMakeCache.txt
 CMakeFiles
 Makefile
 *.cmake
+*.exr
 .ninja_deps
 .ninja_log
 build.ninja

@@ -43,7 +43,7 @@ public:
 
 		// Emitter Sampling
 		// Perform only if not a delta bsdf
-		
+		/*
 		if(!bsdf->isDelta())
 		{
 			EmitterQueryRecord eRec;
@@ -82,6 +82,7 @@ public:
 				}				
 			}			
 		}
+		*/
 		
 		// BSDF sampling
 		// If there were only one light and that light was a delta light, we can't do this kind of sampling.
@@ -120,7 +121,7 @@ public:
 							mis = pdf_m / (pdf_m + pdf_e);
 						}
 
-						L_mats += (f * Li * fabsf(Frame::cosTheta(bRec.wo))) * mis;
+						L_mats += (f * Li * fabsf(Frame::cosTheta(bRec.wo)));// *mis;
 					}
 				}
 			}

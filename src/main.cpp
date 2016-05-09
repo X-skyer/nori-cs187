@@ -101,7 +101,6 @@ int main(int argc, char **argv) {
 		if (std::string(argv[i]) == "-s")
 		{
 			silent = true;
-			break;
 		}
 		if (std::string(argv[i]) == "-f")
 		{

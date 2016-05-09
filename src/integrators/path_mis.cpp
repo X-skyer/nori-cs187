@@ -161,8 +161,7 @@ public:
 				eRec.n = isect.shFrame.n;
 				L += throughput * isect.mesh->getEmitter()->eval(eRec);
 
-				// Assume for now we dont bounce off the light sources.
-				break;
+				// Assume for now we dont bounce off the light sources.				
 			}
 
 			const BSDF* bsdf = isect.mesh->getBSDF();			

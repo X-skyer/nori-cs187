@@ -42,8 +42,7 @@ public:
 		const Emitter* random_emitter = scene->getRandomEmitter(sampler->next1D());
 
 		// Emitter Sampling
-		// Perform only if not a delta bsdf
-		/*
+		// Perform only if not a delta bsdf		
 		if(!bsdf->isDelta())
 		{
 			EmitterQueryRecord eRec;
@@ -82,8 +81,7 @@ public:
 				}				
 			}			
 		}
-		*/
-		
+				
 		// BSDF sampling
 		// If there were only one light and that light was a delta light, we can't do this kind of sampling.
 		if (!(scene->getLights().size() == 1 && scene->getLights()[0]->isDelta()))
@@ -175,8 +173,7 @@ public:
 			Color3f f = bsdf->sample(bRec, sampler->next2D());
 			Vector3f reflected_dir = isect.toWorld(bRec.wo);
 
-			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));
-			throughput *= f * cos_theta;
+			throughput *= f * fabsf(Frame::cosTheta(bRec.wo));
 
 			// Check if specular bounce
 			wasLastBounceSpecular = bsdf->isDelta();

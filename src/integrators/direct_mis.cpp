@@ -77,12 +77,12 @@ public:
 					Color3f Li = e->eval(eRec);
 
 					// Compute the direct lighting equation.
-					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);			
+					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 					float mis = bpdf / (bpdf + lpdf);
 
-					if(mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
+					if (mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
 						evalTerm *= mis;
-					
+
 					L_bsdf += evalTerm;
 				}
 			}

@@ -77,11 +77,12 @@ public:
 				{
 					// The BSDF has no way of generating a direction that would hit this light
 					// Hence multiply by MIS value only when 
-					L_ems *= mis;
+					//L_ems *= mis;
 				}				
 			}			
 		}
 				
+		/*
 		// BSDF sampling
 		// If there were only one light and that light was a delta light, we can't do this kind of sampling.
 		if (!(scene->getLights().size() == 1 && scene->getLights()[0]->isDelta()))
@@ -125,8 +126,8 @@ public:
 				}
 			}
 		}
-
-
+		*/
+		
 		return (L_ems + L_mats) / pdf;
 	}
 
@@ -153,23 +154,28 @@ public:
 			// Check if direct emitter intersection
 			// return this only if direct hit or previous hit was from a specular surface
 			// because we couldnt have sampled it using a light sampling strategy.
-			if (isect.mesh->isEmitter() && (depth == 0 || !wasLastBounceSpecular))
+			if (isect.mesh->isEmitter())// && (depth == 0 || wasLastBounceSpecular))
 			{
-				EmitterQueryRecord eRec;
-				eRec.ref = traced_ray.o;
-				eRec.wi = traced_ray.d;
-				eRec.n = isect.shFrame.n;
-				L += throughput * isect.mesh->getEmitter()->eval(eRec);
+				//if (depth == 0 || wasLastBounceSpecular)
+				{
+					EmitterQueryRecord eRec;
+					eRec.ref = traced_ray.o;
+					eRec.wi = traced_ray.d;
+					eRec.n = isect.shFrame.n;
+					L += throughput * isect.mesh->getEmitter()->eval(eRec);
+				}
+				//else break;
 
 				// Assume for now we dont bounce off the light sources.				
 			}
+			
 
 			const BSDF* bsdf = isect.mesh->getBSDF();			
 
 			// NEE
-			Color3f Li = LiDirect(scene, sampler, traced_ray, isect);
-			Color3f debug = throughput * Li;
-			L += throughput * Li;
+			//Color3f Li = LiDirect(scene, sampler, traced_ray, isect);
+			//Color3f debug = throughput * Li;
+			//L += throughput * Li;
 						
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));

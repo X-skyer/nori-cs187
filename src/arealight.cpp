@@ -108,7 +108,7 @@ public:
 		ray = Ray3f(eRec.p, xfm_wi, Epsilon, INFINITY);
 
 		// Return power
-		return M_PI * m_mesh->totalSurfaceArea() * m_radiance;
+		return M_PI * m_mesh->totalSurfaceArea() * m_radiance / Frame::cosTheta(wi);
     }
 
 	// Get the parent mesh

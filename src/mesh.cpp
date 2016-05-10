@@ -53,11 +53,11 @@ void Mesh::activate() {
 
 void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n, float optional_u) const
 {
-	auto id = m_pdfs.sample(sample.x());
+	auto id = m_pdfs.sample(optional_u);
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
 	// barycentric sampling of triangle.
-	float u1 = sqrtf(optional_u);
+	float u1 = sqrtf(sample.x());
 	float u = 1.0f - u1;
 	float v = sample.y() * u1;
 

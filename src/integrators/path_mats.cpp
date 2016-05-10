@@ -77,6 +77,11 @@ public:
 			// Propogate
 			traced_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
 			depth++;
+
+			if (!L.isValid())
+			{
+				std::cout << "Catching" << std::endl;
+			}
 		}
 
 		return L;

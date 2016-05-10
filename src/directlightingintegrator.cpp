@@ -30,7 +30,7 @@ public:
 			eRec.n = its.geoFrame.n;
 			
 			// Get the incoming radiance and create shadow ray.
-			Color3f Li = e->sample(eRec, sampler->next2D());
+			Color3f Li = e->sample(eRec, sampler->next2D(), sampler->next1D());
 			const Ray3f shadow_ray(its.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist);
 			Intersection s_isect;
 			if (!scene->rayIntersect(shadow_ray, s_isect))

@@ -48,6 +48,14 @@ public:
 		
 		float Fr = fresnel(Frame::cosTheta(bRec.wi), m_extIOR, m_intIOR);
 
+		// do refraction
+		bool entering = Frame::cosTheta(bRec.wi) > 0.0f;
+		float eta_i = m_extIOR;
+		float eta_t = m_intIOR;
+
+		if (!entering)
+			std::swap(eta_i, eta_t);
+
 		// check if reflection or refraction
 		if (sample.x() < Fr)
 		{
@@ -59,20 +67,13 @@ public:
 			bRec.measure = EDiscrete;
 
 			/* Relative index of refraction: no change */
-			bRec.eta = 1.0f;
+			bRec.eta = eta_i;
 
 			// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
 			return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
 		}
 		else
 		{
-			// do refraction
-			bool entering = Frame::cosTheta(bRec.wi) > 0.0f;
-			float eta_i = m_extIOR;
-			float eta_t = m_intIOR;
-			if (!entering)
-				std::swap(eta_i, eta_t);
-
 			// Compute transmitted direction
 			float sini2 = 1.0f - (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wi));
 			float eta = eta_i / eta_t;

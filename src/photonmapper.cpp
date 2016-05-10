@@ -79,15 +79,17 @@ public:
 	// put your code to trace photons here
 		int stored_photons = 0;
 		int emitted_photons = 0;
+		int n_lights = scene->getLights().size();
+
 		while (stored_photons < m_photonCount)
 		{
 			// First choose a light
 			const Emitter* emitter = scene->getRandomEmitter(sampler->next1D());
-
+			
 			if (emitter->getEmitterType() == EmitterType::EMITTER_AREA)
 			{
 				Ray3f photon_ray;
-				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D(), sampler->next1D());
+				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D(), sampler->next1D()) * n_lights;
 				if (!photon_power.isZero())
 				{
 					emitted_photons++;			// keep track of how many photons we shot to divide the contrib of all stored photons finally
@@ -128,6 +130,7 @@ public:
 
 						//update the photon power
 						// pdf is included in the f term
+						Color3f incoming_power = photon_power;
 						photon_power *= f * fabsf(Frame::cosTheta(bRec.wo));
 
 						// Check for zero bsdf
@@ -137,9 +140,10 @@ public:
 						// Check for russian roulette
 						if (depth > m_rrStart)
 						{
-							if (sampler->next1D() < 0.5f)
+							float p = 1.0f - photon_power.getLuminance() / incoming_power.getLuminance();
+							if (sampler->next1D() < p)
 								break;
-							else photon_power *= 2.0f;
+							else photon_power /= (1.0f - p);
 						}
 						if (depth > m_maxDepth && m_maxDepth != -1)
 						{

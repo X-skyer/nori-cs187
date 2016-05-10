@@ -49,7 +49,7 @@ public:
 			float pdf_e, pdf_m;
 			eRec.ref = isect.p;
 
-			Color3f Li = random_emitter->sample(eRec, sampler->next2D());
+			Color3f Li = random_emitter->sample(eRec, sampler->next2D(), sampler->next1D());
 			pdf_e = eRec.pdf;
 			
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d), isect.toLocal(eRec.wi), ESolidAngle);
@@ -60,7 +60,7 @@ public:
 				float mis = pdf_e / (pdf_m + pdf_e);
 
 				// Compute lighting
-				L_ems = f * Li * fabsf(isect.shFrame.n.dot(eRec.wi)) / pdf;
+				L_ems = f * Li * fabsf(isect.shFrame.n.dot(eRec.wi));
 
 				// Compute shadow ray only when 
 				if (L_ems.isValid() && !L_ems.isZero())
@@ -97,7 +97,7 @@ public:
 				if (scene->rayIntersect(Ray3f(isect.p, isect.toWorld(bRec.wo), Epsilon, INFINITY), light_isect))
 				{
 					// check if a light soruce
-					if (light_isect.mesh->isEmitter())
+					if (light_isect.mesh->isEmitter() && light_isect.mesh->getEmitter() == random_emitter)
 					{
 						const Emitter* light = light_isect.mesh->getEmitter();
 
@@ -119,14 +119,15 @@ public:
 							mis = pdf_m / (pdf_m + pdf_e);
 						}
 
-						L_mats += (f * Li * fabsf(Frame::cosTheta(bRec.wo)));// *mis;
+						L_mats = (f * Li * fabsf(Frame::cosTheta(bRec.wo)));
+						L_mats *= mis;
 					}
 				}
 			}
 		}
 
 
-		return L_ems + L_mats;
+		return (L_ems + L_mats) / pdf;
 	}
 
 
@@ -166,7 +167,9 @@ public:
 			const BSDF* bsdf = isect.mesh->getBSDF();			
 
 			// NEE
-			L += throughput * LiDirect(scene, sampler, ray, isect);
+			Color3f Li = LiDirect(scene, sampler, traced_ray, isect);
+			Color3f debug = throughput * Li;
+			L += throughput * Li;
 						
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));

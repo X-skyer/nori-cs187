@@ -91,7 +91,7 @@ public:
      * \return The emitter value divided by the probability density of the sample.
      *         A zero value means that sampling failed.
      */
-    virtual Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u = 0.0f) const = 0;
+    virtual Color3f sample(EmitterQueryRecord &lRec, const Point2f &sample, float optional_u) const = 0;
 
     /**
      * \brief Compute the probability of sampling \c lRec.p.

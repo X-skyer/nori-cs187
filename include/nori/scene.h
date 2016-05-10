@@ -134,7 +134,7 @@ public:
     virtual EClassType getClassType() const { return EScene; }
 
 	//	Return the background color of the scene if the ray never intersected the scene or escaped the scene.
-	Color3f getBackground(const Ray3f& ray, const Point2f& sample) const;
+	Color3f getBackground(const Ray3f& ray) const;
 
 private:
     std::vector<Mesh *> m_meshes;

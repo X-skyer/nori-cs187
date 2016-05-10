@@ -190,7 +190,7 @@ public:
 		while (depth < m_maxDepth || m_maxDepth == -1)
 		{
 			if (!scene->rayIntersect(traced_ray, isect))
-				return scene->getBackground(traced_ray, sampler->next2D());
+				return scene->getBackground(traced_ray);
 
 			if (isect.mesh->isEmitter())
 			{

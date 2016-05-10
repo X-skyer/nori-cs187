@@ -23,19 +23,7 @@ public:
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
-		{
-			for (auto e : scene->getLights())
-			{
-				if (e->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
-				{
-					// get the distant light as of now and return the radiance for the direction
-					EmitterQueryRecord eRec;
-					eRec.wi = ray.d;
-					return e->eval(eRec);
-				}
-			}
-			return Color3f(0.0f);
-		}
+			return scene->getBackground(ray);
 
 		/* Intersection found */
 		Color3f Ld(0.0f);
@@ -46,7 +34,7 @@ public:
 			EmitterQueryRecord eRec;
 			eRec.ref = ray.o;
 			eRec.wi = ray.d;
-			eRec.n = its.geoFrame.n;
+			eRec.n = its.shFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
 			Ld += e->eval(eRec);
 		}
@@ -71,7 +59,7 @@ public:
 				eRec.ref = shadow_ray.o;
 				eRec.emitter = s_isect.mesh->getEmitter();
 				eRec.wi = its.toWorld(bRec.wo);
-				eRec.n = s_isect.geoFrame.n;
+				eRec.n = s_isect.shFrame.n;
 				eRec.p = s_isect.p;
 				eRec.dist = (eRec.p - eRec.ref).norm();
 
@@ -81,28 +69,14 @@ public:
 
 				// Compute the direct lighting equation.
 				Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
-				if (!evalTerm.isValid())
-				{
-					std::cout << "Invalid term" << std::endl;
-				}
 				Ld += evalTerm;
 			}
 		}
 		else
 		{
 			// Check if light is directional?
-			for (auto e : scene->getLights())
-			{
-				if (e->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
-				{
-					// get the distant light as of now and return the radiance for the direction
-					EmitterQueryRecord eRec;
-					eRec.wi = shadow_ray.d;
-					Color3f Li = e->eval(eRec);
-					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
-					Ld += evalTerm;
-				}
-			}
+			Color3f Li = scene->getBackground(shadow_ray);
+			Ld += f * Li * fmaxf(its.shFrame.n.dot(shadow_ray.d), 0.0f);
 		}
 
 		return Ld;

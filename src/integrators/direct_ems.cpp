@@ -26,7 +26,7 @@ public:
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
-			return scene->getBackground(ray, sampler->next2D());
+			return scene->getBackground(ray);
 
 		/* Intersection found */
 		// Check for intersection if a direct light source.

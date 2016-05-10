@@ -23,20 +23,7 @@ public:
 		/* Find the surface that is visible in the requested direction */
 		Intersection its;
 		if (!scene->rayIntersect(ray, its))
-		{
-			for (auto e : scene->getLights())
-			{
-				if (e->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
-				{
-					// get the distant light as of now and return the radiance for the direction
-					EmitterQueryRecord eRec;
-					eRec.wi = ray.d;
-					return e->eval(eRec);
-				}
-			}
-			return Color3f(0.0f);
-		}
-
+			return scene->getBackground(ray);
 
 		/* 
 			Valid intersection found.
@@ -44,6 +31,7 @@ public:
 		*/
 
 		// If intersecting a direct light source, return radiance immediately.
+		Color3f Le(0.0f);
 		if (its.mesh->isEmitter())
 		{
 			EmitterQueryRecord eRec;
@@ -51,7 +39,7 @@ public:
 			eRec.wi = ray.d;
 			eRec.n = its.geoFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
-			return e->eval(eRec);
+			Le += e->eval(eRec);
 		}
 		
 		Color3f L_bsdf(0.0f), L_emitter(0.0f);
@@ -158,7 +146,7 @@ public:
 				}
 			}
 		}
-		return L_bsdf + L_emitter;
+		return Le + L_bsdf + L_emitter;
 	}
 
 	std::string toString() const

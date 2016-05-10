@@ -134,7 +134,7 @@ std::string Scene::toString() const {
     );
 }
 
-Color3f Scene::getBackground(const Ray3f& ray, const Point2f& sample) const
+Color3f Scene::getBackground(const Ray3f& ray) const
 {
 	if (m_bgEmitter != nullptr)
 	{

@@ -147,7 +147,7 @@ public:
 			// Check if ray misses the scene
 			if (!scene->rayIntersect(traced_ray, isect))
 			{
-				L += throughput * scene->getBackground(traced_ray, sampler->next2D());
+				L += throughput * scene->getBackground(traced_ray);
 				break;
 			}
 

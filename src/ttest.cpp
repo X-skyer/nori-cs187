@@ -73,7 +73,11 @@ public:
             m_references.push_back(toFloat(angle));
 
         /* Number of BSDF samples that should be generated (default: 100K) */
-        m_sampleCount = propList.getInteger("sampleCount", 100000);
+#ifdef _DEBUG
+        m_sampleCount = propList.getInteger("sampleCount", 10);
+#else
+		m_sampleCount = propList.getInteger("sampleCount", 100000);
+#endif
     }
 
     virtual ~StudentsTTest() {

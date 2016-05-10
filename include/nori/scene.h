@@ -136,6 +136,8 @@ public:
 	//	Return the background color of the scene if the ray never intersected the scene or escaped the scene.
 	Color3f getBackground(const Ray3f& ray) const;
 
+	const Emitter* getBackgroundEmitter() const { return m_bgEmitter; }
+
 private:
     std::vector<Mesh *> m_meshes;
     std::vector<Emitter *> m_emitters;

@@ -89,26 +89,24 @@ public:
 			else
 			{
 				// Check if light is directional?
-				for (auto e : scene->getLights())
+				const Emitter* bgEmitter = scene->getBackgroundEmitter();
+				if (bgEmitter != nullptr)
 				{
-					if (e->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
-					{
-						// get the distant light as of now and return the radiance for the direction
-						EmitterQueryRecord eRec;
-						eRec.wi = shadow_ray.d;
-						eRec.ref = shadow_ray.o;
-						eRec.emitter = e;
-											
-						Color3f Li = e->eval(eRec);
-						float lpdf = e->pdf(eRec);
-						//std::cout << "BSDF_lpdf : " << lpdf << std::endl;
-						Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
-						float mis = bpdf / (bpdf + lpdf);
-						if(!isnan(mis) && mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
-							evalTerm *= mis;
-						
-						L_bsdf += evalTerm;
-					}
+					// get the distant light as of now and return the radiance for the direction
+					EmitterQueryRecord eRec;
+					eRec.wi = shadow_ray.d;
+					eRec.ref = shadow_ray.o;
+					eRec.emitter = bgEmitter;
+
+					Color3f Li = bgEmitter->eval(eRec);
+					float lpdf = bgEmitter->pdf(eRec);
+					//std::cout << "BSDF_lpdf : " << lpdf << std::endl;
+					Color3f evalTerm = f * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
+					float mis = bpdf / (bpdf + lpdf);
+					if (!isnan(mis) && mis != 0.0f && lpdf != 0.0f && bpdf != 0.0f)
+						evalTerm *= mis;
+
+					L_bsdf += evalTerm;
 				}
 			}
 		}

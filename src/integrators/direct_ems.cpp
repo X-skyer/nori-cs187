@@ -36,7 +36,7 @@ public:
 			eRec.p = its.p;
 			eRec.ref = ray.o;
 			eRec.wi = ray.d;
-			eRec.n = its.geoFrame.n;
+			eRec.n = its.shFrame.n;
 			const Emitter* e = its.mesh->getEmitter();
 			Ld += e->eval(eRec);
 		}
@@ -53,7 +53,7 @@ public:
 			Color3f Li = e->sample(eRec, sampler->next2D(), sampler->next1D());
 			
 			// Compute BSDF contribution for chosen direction.
-			BSDFQueryRecord bRec(its.toLocal(eRec.wi), its.toLocal(-ray.d), ESolidAngle);
+			BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
 			Color3f evalTerm = bsdf->eval(bRec) * Li * fabsf(its.shFrame.n.dot(eRec.wi));
 			
 			if (!evalTerm.isZero() && evalTerm.isValid())

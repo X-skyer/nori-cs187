@@ -55,7 +55,7 @@ public:
             throw NoriException("There is no shape attached to this Area light!");
 
 		// Sample the underlying mesh for a position and normal.
-		m_mesh->samplePosition(sample, lRec.p, lRec.n);
+		m_mesh->samplePosition(sample, lRec.p, lRec.n, optional_u);
 
 		// Construct the EmitterQueryRecord structure.
 		lRec.wi = (lRec.p - lRec.ref).normalized();
@@ -85,7 +85,7 @@ public:
     }
 
 
-    virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2) const {
+    virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2, float another_rand_u) const {
 		if (!m_mesh)
 			throw NoriException("There is no shape attached to this area light");
 
@@ -94,7 +94,7 @@ public:
 
 		// Sample a point to emit from the mesh
 		EmitterQueryRecord eRec;
-		m_mesh->samplePosition(sample1, eRec.p, eRec.n);
+		m_mesh->samplePosition(sample1, eRec.p, eRec.n, another_rand_u);
 		
 		// Sample a direction
 		Vector3f wi = Warp::squareToCosineHemisphere(sample2);

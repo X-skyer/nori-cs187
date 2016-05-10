@@ -87,7 +87,7 @@ public:
 			if (emitter->getEmitterType() == EmitterType::EMITTER_AREA)
 			{
 				Ray3f photon_ray;
-				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D());
+				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D(), sampler->next1D());
 				if (!photon_power.isZero())
 				{
 					emitted_photons++;			// keep track of how many photons we shot to divide the contrib of all stored photons finally

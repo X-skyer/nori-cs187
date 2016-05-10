@@ -25,7 +25,9 @@
 
 NORI_NAMESPACE_BEGIN
 
-Mesh::Mesh() { }
+Mesh::Mesh() { 
+	m_totalSurfaceArea = 0.0f;
+}
 
 Mesh::~Mesh() {
     delete m_bsdf;
@@ -42,22 +44,20 @@ void Mesh::activate() {
 	// create the pdf
 	for (uint32_t i = 0; i < getTriangleCount(); i++)
 	{
-		float area = surfaceArea(i);
-		m_pdfs.append(area);
-		m_totalSurfaceArea += area;
+		float _area = surfaceArea(i);
+		m_pdfs.append(_area);
+		m_totalSurfaceArea += _area;
 	}
 	m_pdfs.normalize();
 }
 
-void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n) const
+void Mesh::samplePosition(const Point2f &sample, Point3f &p, Normal3f &n, float optional_u) const
 {
-
 	auto id = m_pdfs.sample(sample.x());
 	uint32_t i0 = m_F(0, id), i1 = m_F(1, id), i2 = m_F(2, id);
 
 	// barycentric sampling of triangle.
-	float new_random = twoRandsFromOne(sample.x(), 0.5f);
-	float u1 = sqrtf(new_random);
+	float u1 = sqrtf(optional_u);
 	float u = 1.0f - u1;
 	float v = sample.y() * u1;
 

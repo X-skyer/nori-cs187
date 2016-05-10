@@ -118,7 +118,7 @@ public:
     virtual Color3f eval(const EmitterQueryRecord &lRec) const = 0;
 
     /// Sample a photon
-    virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2) const {
+    virtual Color3f samplePhoton(Ray3f &ray, const Point2f &sample1, const Point2f &sample2, float another_u) const {
         throw NoriException("Emitter::samplePhoton(): not implemented!");
     }
 

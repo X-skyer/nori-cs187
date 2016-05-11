@@ -89,7 +89,7 @@ public:
 			if (emitter->getEmitterType() == EmitterType::EMITTER_AREA)
 			{
 				Ray3f photon_ray;
-				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D(), sampler->next1D()) * n_lights;
+				Color3f photon_power = emitter->samplePhoton(photon_ray, sampler->next2D(), sampler->next2D(), sampler->next1D());
 				if (!photon_power.isZero())
 				{
 					emitted_photons++;			// keep track of how many photons we shot to divide the contrib of all stored photons finally
@@ -97,7 +97,7 @@ public:
 					// start the trace of the photon
 					Intersection isect;
 					int depth = 0;
-					while (depth < m_maxDepth || m_maxDepth == -1)
+					while ((depth < m_maxDepth || m_maxDepth == -1) && stored_photons < m_photonCount)
 					{
 						// Check for intersection
 						// If not intersection, don't do anything
@@ -105,17 +105,15 @@ public:
 						{
 							// This photon was waste. So we are not going to use it at all.
 							// So negate it.
-							emitted_photons--;
+							if(depth == 0)
+								emitted_photons--;
+
+							// else break
 							break;
 						}
 
 						const BSDF* bsdf = isect.mesh->getBSDF();
-						if (isect.mesh->isEmitter())
-						{
-							if (depth == 0) { emitted_photons--; }
-							break;
-						}
-
+						
 						if (!bsdf->isDelta())
 						{
 							// Store photon

@@ -65,7 +65,7 @@ public:
 		
 		// Return the appropriately weighted radiance term back
 		// NOTE: We are not checking visibility here. It's the integrator's responsibility to check for the shadow ray test.
-		if(lRec.pdf != 0.0f || fabsf(lRec.pdf) != INFINITY) return m_radiance / lRec.pdf;
+		if(lRec.pdf != 0.0f || fabsf(lRec.pdf) != INFINITY) return eval(lRec) / lRec.pdf;
 		else return 0.0f;
     }
 

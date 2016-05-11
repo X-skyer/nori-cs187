@@ -86,7 +86,7 @@ static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block)
             Point2f pixelSample = Point2f((float) (x + offset.x()), (float) (y + offset.y())) + sampler->next2D();
             Point2f apertureSample = sampler->next2D();
 
-            /* Sample a ray from the camera */
+			/* Sample a ray from the camera */
             Ray3f ray;
             Color3f value = camera->sampleRay(ray, pixelSample, apertureSample);
 

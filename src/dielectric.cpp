@@ -57,9 +57,7 @@ public:
 				bRec.wi.z()
 			);
 			bRec.measure = EDiscrete;
-
-			/* Relative index of refraction: no change */
-			//bRec.eta = eta_i;
+			bRec.pdf = 1.0f;
 
 			// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
 			return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
@@ -76,7 +74,7 @@ public:
 				std::swap(eta_i, eta_t);
 
 			// Compute transmitted direction
-			float sini2 = 1.0f - (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wi));
+			float sini2 = Frame::sinTheta2(bRec.wi);
 			float eta = eta_i / eta_t;
 			float sint2 = eta * eta * sini2;
 
@@ -88,12 +86,14 @@ public:
 					bRec.wi.z()
 				);
 				bRec.measure = EDiscrete;
+				bRec.pdf = 1.0f;
 
 				/* Relative index of refraction: no change */
-				//bRec.eta = eta_i;
+				bRec.eta = eta_i;
 
 				// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
 				return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
+				//return Color3f(1.0f);
 			}
 
 			float cost = sqrtf(std::max(0.0f, 1.0f - sint2));

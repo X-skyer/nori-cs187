@@ -66,8 +66,8 @@ public:
 			{
 				float prob_cont = throughput.getLuminance();
 				if (sampler->next1D() < prob_cont)
-					break;
-				else throughput *= (1.0f / (1-prob_cont));
+					throughput *= (1.0f / prob_cont);
+				else break;
 			}
 			else if (depth > m_maxDepth && m_maxDepth != -1)
 			{

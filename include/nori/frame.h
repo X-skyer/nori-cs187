@@ -68,7 +68,7 @@ struct Frame {
         return v.z();
     }
 
-    /** \brief Assuming that the given direction is in the local coordinate
+	/** \brief Assuming that the given direction is in the local coordinate
      * system, return the sine of the angle between the normal and v */
     static float sinTheta(const Vector3f &v) {
         float temp = sinTheta2(v);

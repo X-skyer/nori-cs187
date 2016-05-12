@@ -105,8 +105,8 @@ public:
 						{
 							// This photon was waste. So we are not going to use it at all.
 							// So negate it.
-							if(depth == 0)
-								emitted_photons--;
+							//if(depth == 0)
+							//	emitted_photons--;
 
 							// else break
 							break;
@@ -215,9 +215,9 @@ public:
 				m_photonMap->search(isect.p, m_photonRadius, results);
 				float area = M_PI * square(m_photonRadius);
 
-				for (uint32_t i : results)
+				for (uint32_t i = 0; i < results.size() - 1; i++)
 				{
-					const Photon &photon = (*m_photonMap)[i];
+					const Photon &photon = (*m_photonMap)[results[i]];
 					
 					// Compute the integral equation
 					BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d), isect.toLocal(-photon.getDirection()), ESolidAngle);

@@ -92,8 +92,9 @@ public:
 				bRec.eta = eta_i;
 
 				// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
-				return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
-				//return Color3f(1.0f);
+				if (sint2 == 1.0f) return Color3f(0.0f);
+				//return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi))) * (Fr / (1-Fr));
+				return Color3f(1.0f);
 			}
 
 			float cost = sqrtf(std::max(0.0f, 1.0f - sint2));

@@ -10,7 +10,7 @@ class PathIntegratorMats : public Integrator
 public:
 	PathIntegratorMats(const PropertyList& props)
 	{
-		m_rrStart = props.getInteger("rrStart", 5);
+		m_rrStart = props.getInteger("rrStart", 10);
 		m_maxDepth = props.getInteger("maxDepth", -1);
 	}
 
@@ -64,9 +64,10 @@ public:
 			// Check for russian roulette
 			if (depth > m_rrStart)
 			{
-				if (sampler->next1D() < 0.5f)
+				float prob_cont = throughput.getLuminance();
+				if (sampler->next1D() < prob_cont)
 					break;
-				else throughput *= 2.0f;
+				else throughput *= (1.0f / (1-prob_cont));
 			}
 			else if (depth > m_maxDepth && m_maxDepth != -1)
 			{

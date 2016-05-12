@@ -82,8 +82,18 @@ public:
 
 			if (sint2 >= 1.0f)
 			{
-				bRec.wi = Vector3f(0.0f);
-				return 0.0f;
+				bRec.wo = Vector3f(
+					-bRec.wi.x(),
+					-bRec.wi.y(),
+					bRec.wi.z()
+				);
+				bRec.measure = EDiscrete;
+
+				/* Relative index of refraction: no change */
+				//bRec.eta = eta_i;
+
+				// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
+				return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
 			}
 
 			float cost = sqrtf(std::max(0.0f, 1.0f - sint2));

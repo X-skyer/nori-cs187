@@ -114,7 +114,7 @@ public:
 
 						const BSDF* bsdf = isect.mesh->getBSDF();
 						
-						if (!bsdf->isDelta())
+						if (bsdf->isDiffuse())
 						{
 							// Store photon
 							m_photonMap->push_back(Photon(isect.p, photon_ray.d, photon_power));
@@ -222,9 +222,8 @@ public:
 					// Compute the integral equation
 					BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d), isect.toLocal(-photon.getDirection()), ESolidAngle);
 
-					L += bsdf->eval(bRec) * photon.getPower() / area;
+					L += throughput * bsdf->eval(bRec) * photon.getPower() / area;
 				}
-
 				// Immediately stop recursion
 				break;
 			}

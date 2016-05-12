@@ -129,7 +129,7 @@ public:
      * is primarily used by photon mapping to decide whether
      * or not to store photons on a surface
      */
-	virtual bool isDiffuse() const { return m_type == BsdfType::BSDF_DIFFUSE || m_type == BsdfType::BSDF_MICROFACET; }
+	virtual bool isDiffuse() const { return false; }
 
 	bool isDelta() const { return m_type == BsdfType::BSDF_MIRROR || m_type == BsdfType::BSDF_DIELECTRIC; }
 

@@ -78,6 +78,7 @@ public:
 			float eta = eta_i / eta_t;
 			float sint2 = eta * eta * sini2;
 
+			// This branch never gets taken.
 			if (sint2 >= 1.0f)
 			{
 				bRec.wo = Vector3f(
@@ -109,7 +110,8 @@ public:
 
 			// The (1-fr) term disappears because the probability of sampling this refraction is also (1-fr)
 			// Hence the numerator term and the denominator term cancel out.
-			return (square(eta_t) / square(eta_i)) / (fabsf(Frame::cosTheta(bRec.wo)));
+			//return (square(eta_t) / square(eta_i)) / (fabsf(Frame::cosTheta(bRec.wo)));
+			return 1.0f / (fabsf(Frame::cosTheta(bRec.wo)));
 		}
     }
 

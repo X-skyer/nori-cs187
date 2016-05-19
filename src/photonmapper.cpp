@@ -215,14 +215,18 @@ public:
 				m_photonMap->search(isect.p, m_photonRadius, results);
 				float area = M_PI * square(m_photonRadius);
 
-				for (uint32_t i = 0; i < results.size() - 1; i++)
+				// The uint32_t makes the size() - 1 wrap around. Subtle bug.
+				if (results.size() > 0)
 				{
-					const Photon &photon = (*m_photonMap)[results[i]];
-					
-					// Compute the integral equation
-					BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d), isect.toLocal(-photon.getDirection()), ESolidAngle);
+					for (uint32_t i = 0; i < results.size() - 1; i++)
+					{
+						const Photon &photon = (*m_photonMap)[results[i]];
 
-					L += throughput * bsdf->eval(bRec) * photon.getPower() / area;
+						// Compute the integral equation
+						BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d), isect.toLocal(-photon.getDirection()), ESolidAngle);
+
+						L += throughput * bsdf->eval(bRec) * photon.getPower() / area;
+					}
 				}
 				// Immediately stop recursion
 				break;

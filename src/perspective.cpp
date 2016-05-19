@@ -36,7 +36,7 @@ public:
         m_outputSize.x() = propList.getInteger("width", 1280);
         m_outputSize.y() = propList.getInteger("height", 720);
         m_invOutputSize = m_outputSize.cast<float>().cwiseInverse();
-
+		
         /* Specifies an optional camera-to-world transformation. Default: none */
         m_cameraToWorld = propList.getTransform("toWorld", Transform());
 
@@ -46,6 +46,8 @@ public:
         /* Near and far clipping planes in world-space units */
         m_nearClip = propList.getFloat("nearClip", 1e-4f);
         m_farClip = propList.getFloat("farClip", 1e4f);
+		m_focalLength = propList.getFloat("focalLength", -1.0f);			// default value for a pinhole camera is -1. Invalid term
+		m_lensRadius = propList.getFloat("radius", 0.0f);					// this term is invalid without the correct focal length term.
 
         m_rfilter = NULL;
     }
@@ -96,18 +98,42 @@ public:
             samplePosition.x() * m_invOutputSize.x(),
             samplePosition.y() * m_invOutputSize.y(), 0.0f);
 
-        /* Turn into a normalized ray direction, and
-           adjust the ray interval accordingly */
-        Vector3f d = nearP.normalized();
-        float invZ = 1.0f / d.z();
+		Vector3f d = nearP.normalized();
+		float invZ = 1.0f / d.z();
 
-        ray.o = m_cameraToWorld * Point3f(0, 0, 0);
-        ray.d = m_cameraToWorld * d;
-        ray.mint = m_nearClip * invZ;
-        ray.maxt = m_farClip * invZ;
-        ray.update();
+		/* Turn into a normalized ray direction, and
+		adjust the ray interval accordingly */
+		ray.o = Point3f(0, 0, 0);
+		ray.d = d;
+		ray.mint = m_nearClip * invZ;
+		ray.maxt = m_farClip * invZ;		
 
-        return Color3f(1.0f);
+		// Compute direction based on if a valid lens model.
+		if (m_lensRadius > 0.0f && m_focalLength != -1.0f)
+		{
+			// Choose a point on the lens.
+			Point2f lens_pt = Warp::squareToUniformDisk(apertureSample);
+
+			// Scale it by the radius
+			lens_pt *= m_lensRadius;
+
+			// Compute intersection pt with focal plane.
+			float t = m_focalLength * invZ;
+
+			// Compute the point on the focal plane and get the new direction of ray.
+			Point3f pt = ray(t);
+			
+			// Set the new origin and direction.
+			ray.o = Point3f(lens_pt.x(), lens_pt.y(), 0.f);
+			ray.d = (pt - ray.o).normalized();
+		}
+
+		// Update the ray.
+		ray.o = m_cameraToWorld * ray.o;
+		ray.d = m_cameraToWorld * ray.d;
+		
+		ray.update();
+		return Color3f(1.0f);
     }
 
     virtual void addChild(NoriObject *obj) {

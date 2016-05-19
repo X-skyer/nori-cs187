@@ -72,6 +72,8 @@ public:
 protected:
     Vector2i m_outputSize;
     ReconstructionFilter *m_rfilter;
+	float m_focalLength;					// focal length of the lens model.
+	float m_lensRadius;						// radius of the thin lens.
 };
 
 NORI_NAMESPACE_END

@@ -78,26 +78,6 @@ public:
 			float eta = eta_i / eta_t;
 			float sint2 = eta * eta * sini2;
 
-			// This branch never gets taken.
-			if (sint2 >= 1.0f)
-			{
-				bRec.wo = Vector3f(
-					-bRec.wi.x(),
-					-bRec.wi.y(),
-					bRec.wi.z()
-				);
-				bRec.measure = EDiscrete;
-				bRec.pdf = 1.0f;
-
-				/* Relative index of refraction: no change */
-				bRec.eta = eta_i;
-
-				// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
-				if (sint2 == 1.0f) return Color3f(0.0f);
-				//return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi))) * (Fr / (1-Fr));
-				return Color3f(1.0f);
-			}
-
 			float cost = sqrtf(std::max(0.0f, 1.0f - sint2));
 			if (entering) cost = -cost;
 			float sintOverSini = eta;

@@ -7,6 +7,7 @@
 /scenes/
 /scenes/
 /build_vs2015/
+/build_vs2013/
 CMakeCache.txt
 CMakeFiles
 Makefile

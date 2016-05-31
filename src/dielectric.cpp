@@ -49,6 +49,7 @@ public:
 		float Fr = fresnel(Frame::cosTheta(bRec.wi), m_extIOR, m_intIOR);
 
 		// check if reflection or refraction
+		// if TIR, Fr = 1, and hence this branch is always taken.
 		if (sample.x() < Fr)
 		{
 			bRec.wo = Vector3f(

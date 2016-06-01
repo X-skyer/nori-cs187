@@ -69,6 +69,8 @@ public:
         UniformHemisphere,
         CosineHemisphere,
         Beckmann,
+		GGX,
+		Phong,
         MicrofacetBRDF
     };
 
@@ -95,6 +97,8 @@ public:
             case UniformHemisphere: result << Warp::squareToUniformHemisphere(sample); break;
             case CosineHemisphere: result << Warp::squareToCosineHemisphere(sample); break;
             case Beckmann: result << Warp::squareToBeckmann(sample, parameterValue); break;
+			case GGX: result << Warp::squareToGgx(sample, parameterValue); break;
+			case Phong: result << Warp::squareToPhong(sample, parameterValue); break;
             case MicrofacetBRDF: {
                 BSDFQueryRecord bRec(m_bRec);
                 float value = m_brdf->sample(bRec, sample).getLuminance();
@@ -260,8 +264,8 @@ public:
         m_pointCountBox->setValue(str);
         m_parameterBox->setValue(tfm::format("%.1g", parameterValue));
         m_angleBox->setValue(tfm::format("%.1f", m_angleSlider->value() * 180-90));
-        m_parameterSlider->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
-        m_parameterBox->setEnabled(warpType == Beckmann || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
+        m_parameterSlider->setEnabled(warpType == Beckmann || warpType == GGX || warpType == Phong || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
+        m_parameterBox->setEnabled(warpType == Beckmann || warpType == GGX || warpType == Phong || warpType == MicrofacetBRDF || warpType == UniformSphereCap);
         m_angleBox->setEnabled(warpType == MicrofacetBRDF);
         m_angleSlider->setEnabled(warpType == MicrofacetBRDF);
         m_parameterBox->setEnabled(warpType == MicrofacetBRDF);
@@ -456,16 +460,20 @@ public:
                            (float) (sinTheta * sinPhi),
                            (float) y);
 
-                if (warpType == UniformSphere)
-                    return Warp::squareToUniformSpherePdf(v);
-                else if (warpType == UniformSphereCap)
-                    return Warp::squareToUniformSphereCapPdf(v, parameterValue);
-                else if (warpType == UniformHemisphere)
-                    return Warp::squareToUniformHemispherePdf(v);
-                else if (warpType == CosineHemisphere)
-                    return Warp::squareToCosineHemispherePdf(v);
-                else if (warpType == Beckmann)
-                    return Warp::squareToBeckmannPdf(v, parameterValue);
+				if (warpType == UniformSphere)
+					return Warp::squareToUniformSpherePdf(v);
+				else if (warpType == UniformSphereCap)
+					return Warp::squareToUniformSphereCapPdf(v, parameterValue);
+				else if (warpType == UniformHemisphere)
+					return Warp::squareToUniformHemispherePdf(v);
+				else if (warpType == CosineHemisphere)
+					return Warp::squareToCosineHemispherePdf(v);
+				else if (warpType == Beckmann)
+					return Warp::squareToBeckmannPdf(v, parameterValue);
+				else if (warpType == GGX)
+					return Warp::squareToGgxPdf(v, parameterValue);
+				else if (warpType == Phong)
+					return Warp::squareToPhongPdf(v, parameterValue);
                 else if (warpType == MicrofacetBRDF) {
                     BSDFQueryRecord bRec(m_bRec);
                     bRec.wo = v;
@@ -560,7 +568,7 @@ public:
 
         new Label(m_window, "Warping method", "sans-bold");
         m_warpTypeBox = new ComboBox(m_window, { "None", "Disk", "Sphere", "Spherical cap", "Hemisphere (unif.)",
-                "Hemisphere (cos)", "Beckmann distr.", "Microfacet BRDF" });
+                "Hemisphere (cos)", "Beckmann distr.", "GGX distr.", "Phong distr.", "Microfacet BRDF"});
         m_warpTypeBox->setCallback([&](int) { refresh(); });
 
         panel = new Widget(m_window);

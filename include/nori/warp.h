@@ -48,7 +48,7 @@ public:
     /// Probability density of \ref squareToUniformSphere()
     static float squareToUniformSpherePdf(const Vector3f &v);
 
-    /**
+	/**
      * \brief Uniformly sample a vector on a spherical cap around (0, 0, 1)
      *
      * A spherical cap is the subset of a unit sphere whose directions
@@ -77,6 +77,18 @@ public:
 
     /// Probability density of \ref squareToBeckmann()
     static float squareToBeckmannPdf(const Vector3f &m, float alpha);
+
+	/// Warp a uniformly distributed square sample to a Ggx distribution * cosine for the given 'alpha' parameter
+	static Vector3f squareToGgx(const Point2f& sample, float alpha);
+
+	/// Probability density of \ref squareToGgx()
+	static float squareToGgxPdf(const Vector3f& m, float alpha);
+
+	/// Warp a uniformly distributed square sample to a Phong distribution * cosine for the given 'alpha' parameter
+	static Vector3f squareToPhong(const Point2f& sample, float alpha);
+
+	/// Probability density of \ref squareToPhong()
+	static float squareToPhongPdf(const Vector3f& m, float alpha);
 };
 
 NORI_NAMESPACE_END

@@ -138,14 +138,14 @@ float Warp::squareToBeckmannPdf(const Vector3f &m, float alpha) {
 }
 
 /* Ggx */
-Vector3f Warp::squareToGgx(const Point2f& sample, float alpha)
+Vector3f Warp::squareToGgx(const Point2f& sample, float alpha_g)
 {
-	float theta = atanf(alpha * sqrtf(sample.x()) / sqrtf(1 - sample.x()));
+	float theta = atanf(alpha_g * sqrtf(sample.x()) / sqrtf(1 - sample.x()));
 	float phi = 2.0f * M_PI * sample.y();
 	return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
-float Warp::squareToGgxPdf(const Vector3f& m, float alpha)
+float Warp::squareToGgxPdf(const Vector3f& m, float alpha_g)
 {
 	float cos_theta = Frame::cosTheta(m);
 	if (cos_theta <= 0.0f) return 0.0f;
@@ -156,7 +156,7 @@ float Warp::squareToGgxPdf(const Vector3f& m, float alpha)
 	float tan_theta = tan(theta);
 	float tan_theta2 = tan_theta * tan_theta;
 
-	float alpha2 = alpha * alpha;
+	float alpha2 = alpha_g * alpha_g;
 	float term = alpha2 + tan_theta2;
 	float term2 = term * term;
 
@@ -165,19 +165,19 @@ float Warp::squareToGgxPdf(const Vector3f& m, float alpha)
 }
 
 /* Phong */
-Vector3f Warp::squareToPhong(const Point2f& sample, float alpha)
+Vector3f Warp::squareToPhong(const Point2f& sample, float alpha_p)
 {
-	float theta = acosf(std::pow(sample.x(), 1.0f / (alpha + 2.0f)));
+	float theta = acosf(std::pow(sample.x(), 1.0f / (alpha_p + 2.0f)));
 	float phi = 2 * M_PI * sample.y();
 	return Vector3f(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
-float Warp::squareToPhongPdf(const Vector3f& m, float alpha)
+float Warp::squareToPhongPdf(const Vector3f& m, float alpha_p)
 {
 	float cos_theta = Frame::cosTheta(m);
 	if (cos_theta <= 0.0f) return 0.0f;
 
-	return (alpha + 2.0f) * INV_TWOPI * std::pow(cos_theta, alpha) * cos_theta;
+	return (alpha_p + 2.0f) * INV_TWOPI * std::pow(cos_theta, alpha_p);
 }
 
 

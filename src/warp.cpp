@@ -180,5 +180,4 @@ float Warp::squareToPhongPdf(const Vector3f& m, float alpha_p)
 	return (alpha_p + 2.0f) * INV_TWOPI * std::pow(cos_theta, alpha_p);
 }
 
-
 NORI_NAMESPACE_END

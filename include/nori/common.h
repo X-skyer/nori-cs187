@@ -128,6 +128,7 @@ class KDTree;
 class Emitter;
 struct EmitterQueryRecord;
 class Mesh;
+class Medium;
 class NoriObject;
 class NoriObjectFactory;
 class NoriScreen;

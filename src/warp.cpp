@@ -177,7 +177,7 @@ float Warp::squareToPhongPdf(const Vector3f& m, float alpha_p)
 	float cos_theta = Frame::cosTheta(m);
 	if (cos_theta <= 0.0f) return 0.0f;
 
-	return (alpha_p + 2.0f) * INV_TWOPI * std::pow(cos_theta, alpha_p);
+	return (alpha_p + 2.0f) * INV_TWOPI * std::pow(cos_theta, alpha_p) * cos_theta;
 }
 
 NORI_NAMESPACE_END

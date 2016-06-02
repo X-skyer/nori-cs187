@@ -3,39 +3,38 @@
 
 #include <nori/common.h>
 #include <nori/object.h>
+#include <nori/medium.h>
 
 NORI_NAMESPACE_BEGIN
 
-// Can be used for sampling medium information
-struct MediumQueryRecord
+struct PhaseFunctionSamplingRecord
 {
+	const MediumSamplingRecord& mRec;
+	Vector3f p;
 	Vector3f wi;
 	Vector3f wo;
-	const PhaseFunction* phase;
-	Point3f p;
-	float pdf;
-
-	MediumQueryRecord(const Vector3f& wo) : wo(wo)
-	{		
-	}
-
-	MediumQueryRecord(const Vector3f& _wo, const Vector3f& _wi, const Vector3f& _pos, const PhaseFunction* _p)
+	PhaseFunctionSamplingRecord(const MediumSamplingRecord& rec, const Vector3f& _p, const Vector3f& _wi, const Vector3f& _wo) :
+		mRec(rec), p(_p), wi(_wi), wo(_wo)
 	{
-		wo = _wo;
-		wi = _wi;
-		p = _pos;
-		phase = _p;
+
 	}
 };
 
-
 class PhaseFunction : public NoriObject
 {
-public:
-	virtual Color3f sample(MediumQueryRecord& rec, const Vector2f& _sample) const = 0;
-	virtual float    pdf(MediumQueryRecord& rRec) const = 0;
-	virtual Color3f  eval(MediumQueryRecord& rRec) const = 0;
-	virtual EClassType getClassType() const { return EPhaseFunction; }
+	// evaluate phase function for a sample
+	virtual float eval(const PhaseFunctionSamplingRecord& pRec) = 0;
+
+	// return value/pdf
+	virtual float sample(PhaseFunctionSamplingRecord& pRec, const Point2f& sample) const = 0;
+
+	// return only phase function value, but return pdf in pdf parameter
+	virtual float sample(PhaseFunctionSamplingRecord& pRec, float& pdf, const Point2f& sample) const = 0;
+
+	// get pdf for a sample
+	virtual float pdf(const PhaseFunctionSamplingRecord& pRec) const = 0;
+
+	virtual std::string toString() const = 0;
 };
 
 NORI_NAMESPACE_END

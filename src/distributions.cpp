@@ -38,6 +38,40 @@ Vector3f Distribution::sample(const Vector2f& sample, float& pdf) const
 	return ret;
 }
 
+float Distribution::D(const Vector3f& m) const
+{
+	float cos_theta = Frame::cosTheta(m);
+	if (cos_theta <= 0.0f) return 0.0f;
+
+	switch (m_distribution)
+	{
+		case Distributions::BECKMANN:
+		{
+			float temp = Frame::tanTheta(m) / m_alpha, ct = Frame::cosTheta(m), ct2 = ct*ct;
+			return std::exp(-temp*temp) / (M_PI * m_alpha * m_alpha * ct2 * ct2);
+		}
+		case Distributions::GGX:
+		{
+			float theta = acosf(cos_theta);
+			float cos_theta2 = cos_theta * cos_theta;
+			float cos_theta4 = cos_theta2 * cos_theta2;
+			float tan_theta = tan(theta);
+			float tan_theta2 = tan_theta * tan_theta;
+
+			float alpha2 = m_alpha * m_alpha;
+			float term = alpha2 + tan_theta2;
+			float term2 = term * term;
+
+			return alpha2 / (M_PI * cos_theta4 * term2);
+		}
+		case Distributions::PHONG:
+		{
+			return (m_alpha + 2.0f) * INV_TWOPI * std::pow(Frame::cosTheta(m), m_alpha);
+		}
+	}
+	return 0.0f;
+}
+
 float Distribution::pdf(const Vector3f& m) const
 {
 	float ret = 0.0f;
@@ -85,6 +119,11 @@ float Distribution::smithBeckmannG1(const Vector3f& v, const Vector3f& m) const
 	if (a >= 1.6f)
 		return 1.0f;
 	float a2 = a * a;
+
+	if (isnan(a) || isinf(a))
+	{
+		std::cout << "Something is fishing" << std::endl;
+	}
 
 	/* Use a fast and accurate (<0.35% rel. error) rational
 	approximation to the shadowing-masking function */

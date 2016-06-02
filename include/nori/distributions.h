@@ -26,8 +26,9 @@ public:
 	Distribution(const std::string& distribution, float alpha);
 
 	Vector3f sample(const Vector2f& _sample, float& pdf) const;
+	float D(const Vector3f& m) const;
 	float pdf(const Vector3f& m) const;
-	float G(const Vector3f& wi, const Vector3f& wo, const Vector3f& wm) const;
+	float G(const Vector3f& wi, const Vector3f& wo, const Vector3f& wm) const;	
 
 private:
 	

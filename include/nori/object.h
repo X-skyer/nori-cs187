@@ -91,14 +91,16 @@ public:
     /// Turn a class type into a human-readable string
     static std::string classTypeName(EClassType type) {
         switch (type) {
-            case EScene:      return "scene";
-            case EMesh:       return "mesh";
-            case EBSDF:       return "bsdf";
-            case EEmitter:    return "emitter";
-            case ECamera:     return "camera";
-            case EIntegrator: return "integrator";
-            case ESampler:    return "sampler";
-            case ETest:       return "test";
+            case EScene:			return "scene";
+            case EMesh:				return "mesh";
+            case EBSDF:				return "bsdf";
+            case EEmitter:			return "emitter";
+            case ECamera:			return "camera";
+            case EIntegrator:		return "integrator";
+            case ESampler:			return "sampler";
+            case ETest:				return "test";
+			case EMedium:			return "medium";
+			case EPhaseFunction:	return "phase function";
             default:          return "<unknown>";
         }
     }

@@ -17,8 +17,8 @@ struct MediumSamplingRecord
 	Color3f		m_sigmaS;
 	float		pdf_success;		// pdf of successfully sampling the meidum
 	float		pdf_failure;		// pdf of not successfully sampling the medium
-	Medium*		medium;				// underlying medium that was sampled
-	PhaseFunction* phase_function;
+	const Medium*		medium;				// underlying medium that was sampled
+	const PhaseFunction* phase_function;
 };
 
 class Medium : public NoriObject
@@ -26,6 +26,7 @@ class Medium : public NoriObject
 public:
 
 	virtual bool sample_distance(const Ray3f& ray, MediumSamplingRecord& mRec, const Vector2f& sample) const = 0;
+
 	virtual Color3f eval(const Ray3f& ray, MediumSamplingRecord& mRec) const = 0;
 
 	virtual Color3f eval_transmittance(const Ray3f& ray) const = 0;
@@ -36,11 +37,9 @@ public:
 	
 	virtual EClassType getClassType() const { return EMedium; }
 
-
 	virtual std::string toString() const = 0;
 
 protected:
-	
 	PhaseFunction*	m_phase_funtion;
 	Color3f			m_sigmaA;
 	Color3f			m_sigmaS;

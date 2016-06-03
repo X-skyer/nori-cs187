@@ -22,8 +22,9 @@ struct PhaseFunctionSamplingRecord
 
 class PhaseFunction : public NoriObject
 {
+public:
 	// evaluate phase function for a sample
-	virtual float eval(const PhaseFunctionSamplingRecord& pRec) = 0;
+	virtual float eval(const PhaseFunctionSamplingRecord& pRec) const = 0;
 
 	// return value/pdf
 	virtual float sample(PhaseFunctionSamplingRecord& pRec, const Point2f& sample) const = 0;

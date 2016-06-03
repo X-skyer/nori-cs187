@@ -20,6 +20,7 @@
 #define __NORI_DISCRETE_PDF_H
 
 #include <nori/common.h>
+#include <memory>
 
 NORI_NAMESPACE_BEGIN
 
@@ -175,6 +176,8 @@ public:
         return index;
     }
 
+	
+
     /**
      * \brief Turn the underlying distribution into a
      * human-readable string format
@@ -195,6 +198,7 @@ private:
     float m_sum, m_normalization;
     bool m_normalized;
 };
+
 
 NORI_NAMESPACE_END
 

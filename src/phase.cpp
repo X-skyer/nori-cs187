@@ -106,5 +106,6 @@ private:
 	float m_g;
 };
 
-
+NORI_REGISTER_CLASS(Isotropic, "isotropic");
+NORI_REGISTER_CLASS(PhaseHG, "hg");
 NORI_NAMESPACE_END

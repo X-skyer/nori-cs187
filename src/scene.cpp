@@ -22,6 +22,8 @@
 #include <nori/sampler.h>
 #include <nori/camera.h>
 #include <nori/emitter.h>
+#include <nori/medium.h>
+#include <nori/phase.h>
 
 NORI_NAMESPACE_BEGIN
 
@@ -34,6 +36,8 @@ Scene::~Scene() {
     delete m_sampler;
     delete m_camera;
     delete m_integrator;
+	delete m_scene_medium->m_phase_funtion;
+	delete m_scene_medium;
 }
 
 void Scene::activate() {
@@ -92,7 +96,11 @@ void Scene::addChild(NoriObject *obj) {
                 throw NoriException("There can only be one integrator per scene!");
             m_integrator = static_cast<Integrator *>(obj);
             break;
-
+		case EMedium:
+			if (m_scene_medium)
+				throw NoriException("There can be only one scene medium per scene!");
+			m_scene_medium = static_cast<Medium*>(obj);
+			break;
         default:
             throw NoriException("Scene::addChild(<%s>) is not supported!",
                 classTypeName(obj->getClassType()));

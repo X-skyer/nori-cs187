@@ -35,7 +35,19 @@ public:
 	// get pdf for a sample
 	virtual float pdf(const PhaseFunctionSamplingRecord& pRec) const = 0;
 
+	virtual EClassType getClassType() const { return EPhaseFunction; }
+
 	virtual std::string toString() const = 0;
+
+	void setParent(NoriObject* obj)
+	{
+		if (obj->getClassType() == EMedium)
+		{
+			m_medium = static_cast<Medium*>(obj);
+		}
+	}
+
+	Medium* m_medium;
 };
 
 NORI_NAMESPACE_END

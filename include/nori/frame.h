@@ -134,6 +134,24 @@ struct Frame {
         return !operator==(frame);
     }
 
+
+	/// Some more util methods
+	static Vector3f spherical_direction(float sin_theta, float cos_theta, float phi)
+	{
+		return Vector3f(sin_theta * cosf(phi), sin_theta * sinf(phi), cos_theta);
+	}
+
+	static float spherical_theta(const Vector3f& v)
+	{
+		return acosf(clamp(v.z(), -1.0f, 1.0f));
+	}
+
+	static float spherical_phi(const Vector3f& v)
+	{
+		float p = atan2f(v.x(), v.y());
+		return p < 0.0f ? p + 2 * M_PI : p;
+	}
+
     /// Return a human-readable string summary of this frame
     std::string toString() const {
         return tfm::format(

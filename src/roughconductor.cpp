@@ -42,7 +42,7 @@ public:
 		m_alpha = propList.getFloat("alpha", 0.1f);
 		m_type = BsdfType::BSDF_MICROFACET;
 		const std::string& cior = propList.getString("cior");
-		const std::string& dist = propList.getString("distribution");
+		const std::string& dist = propList.getString("distribution", "beckmann");
 		m_tex_filename = propList.getString("filename", "none");
 
 		if (m_tex_filename != "none")
@@ -98,10 +98,7 @@ public:
 	virtual std::string toString() const {
 		return tfm::format(
 			"Microfacet[\n"
-			"  alpha = %f,\n"
-			"  intIOR = %f,\n"
-			"  extIOR = %f,\n"
-			"]",
+			"  alpha = %f,\n",
 			m_alpha
 		);
 	}

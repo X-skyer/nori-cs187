@@ -54,6 +54,9 @@ public:
 			
 			// Compute BSDF contribution for chosen direction.
 			BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
+			bRec.p = its.p;
+			bRec.uv = its.uv;
+
 			Color3f evalTerm = bsdf->eval(bRec) * Li * fabsf(its.shFrame.n.dot(eRec.wi));
 			
 			if (!evalTerm.isZero() && evalTerm.isValid())

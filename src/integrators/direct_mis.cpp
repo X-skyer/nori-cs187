@@ -52,7 +52,8 @@ public:
 			// Construct a BSDF query record
 			BSDFQueryRecord bRec(its.toLocal(-ray.d));
 			bRec.p = its.p;
-
+			bRec.uv = its.uv;
+			
 			Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
 			float bpdf = bsdf->pdf(bRec);
 			const Ray3f shadow_ray(its.p, its.toWorld(bRec.wo), Epsilon, INFINITY);
@@ -133,6 +134,9 @@ public:
 				{
 					// If unoccluded to the light source, compute the lighting term and add contributions.
 					BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);
+					bRec.p = its.p;
+					bRec.uv = its.uv;
+
 					Color3f evalTerm = bsdf->eval(bRec) * Li * fmaxf(its.shFrame.n.dot(eRec.wi), 0.0f);
 									
 					// compute MIS term

@@ -51,6 +51,8 @@ public:
 
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
+			bRec.uv = isect.uv;
+
 			Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
 			if (!f.isValid())
 			{

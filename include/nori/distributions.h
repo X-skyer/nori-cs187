@@ -26,16 +26,28 @@ public:
 	Distribution(const std::string& distribution, float alpha);
 
 	Vector3f sample(const Vector2f& _sample, float& pdf) const;
+	Vector3f sample(const Vector2f& _sample, float& pdf, float alpha) const;
+	
 	float D(const Vector3f& m) const;
+	float D(const Vector3f& m, float alpha) const;
+
 	float pdf(const Vector3f& m) const;
-	float G(const Vector3f& wi, const Vector3f& wo, const Vector3f& wm) const;	
+	float pdf(const Vector3f& m, float alpha) const;
+
+	float G(const Vector3f& wi, const Vector3f& wo, const Vector3f& wm) const;
+	float G(const Vector3f& wi, const Vector3f& wo, const Vector3f& wm, float alpha) const;
 
 private:
 	
 	Distributions m_distribution;
 	float smithBeckmannG1(const Vector3f& v, const Vector3f& m) const;
+	float smithBeckmannG1(const Vector3f& v, const Vector3f& m, float alpha) const;
+
 	float smithPhongG1(const Vector3f& v, const Vector3f& m) const;
+	float smithPhongG1(const Vector3f& v, const Vector3f& m, float alpha) const;
+
 	float smithGgxG1(const Vector3f& v, const Vector3f& m) const;
+	float smithGgxG1(const Vector3f& v, const Vector3f& m, float alpha) const;
 
 	float m_alpha;
 };

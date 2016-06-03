@@ -46,18 +46,23 @@ add_executable(nori
   include/nori/camera.h
   include/nori/color.h
   include/nori/common.h
+  include/nori/complexior.h
+  include/nori/distributions.h
   include/nori/dpdf.h
   include/nori/emitter.h
   include/nori/frame.h
   include/nori/integrator.h
+  include/nori/medium.h
   include/nori/mesh.h
   include/nori/object.h
   include/nori/optionsparser.h
   include/nori/parser.h
+  include/nori/phase.h
   include/nori/pointlight.h
   include/nori/proplist.h
   include/nori/ray.h
   include/nori/rfilter.h
+  include/nori/sample.h
   include/nori/sampler.h
   include/nori/scene.h
   include/nori/timer.h
@@ -66,17 +71,24 @@ add_executable(nori
   include/nori/warp.h
 
   # Source code files
+  src/arealight.cpp
   src/avintegrator.cpp
   src/bitmap.cpp
   src/block.cpp
   src/bvh.cpp
   src/chi2test.cpp
   src/common.cpp
-  src/diffuse.cpp
+  src/roughconductor.cpp
+  src/smoothconductor.cpp
+  src/dielectric.cpp
+  src/diffuse.cpp  
   src/directlightingintegrator.cpp
+  src/distributions.cpp
   src/emitters/distantdisk.h
   src/emitters/distantdisk.cpp
+  src/environmentlight.cpp
   src/gui.cpp
+  src/homogeneous.cpp
   src/independent.cpp
   src/integrators/direct_ems.cpp
   src/integrators/direct_mats.cpp
@@ -91,9 +103,11 @@ add_executable(nori
   src/parser.cpp
   src/perspective.cpp
   src/pointlight.cpp
+  src/phase.cpp
   src/proplist.cpp
   src/render.cpp
   src/rfilter.cpp
+  src/roughdielectric.cpp
   src/scene.cpp
   src/ttest.cpp
   src/warp.cpp
@@ -103,6 +117,7 @@ add_executable(nori
   src/dielectric.cpp
   src/photonmapper.cpp
   src/arealight.cpp
+  src/volpath.cpp
 )
 
 

@@ -52,6 +52,28 @@ public:
     void saveToLDR(const std::string &filename);
 };
 
+class Texture : public Bitmap
+{
+public:
+
+	Texture() {}
+
+	Texture(const std::string& filename);
+
+	Color3f getval(float x, float y) const;
+
+	int get_width() const { return m_width; }
+	int get_height() const { return m_height; }
+
+private:
+
+	Color3f bilerp(float x, float y) const;
+	Color3f trilerp(float x, float y) const;
+
+	int m_width, m_height;
+	std::string  m_filename;
+};
+
 NORI_NAMESPACE_END
 
 #endif /* __NORI_BITMAP_H */

@@ -24,8 +24,14 @@ NORI_NAMESPACE_BEGIN
 /// Ideal mirror BRDF
 class Mirror : public BSDF {
 public:
-    Mirror(const PropertyList &) {
+    Mirror(const PropertyList &props) {
 		m_type = BsdfType::BSDF_MIRROR;
+		m_tex_filename = props.getString("filename", "none");
+		if (m_tex_filename != "none")
+		{
+			m_hasTexture = true;
+			m_texture = Texture(m_tex_filename);
+		}
 	}
 
     virtual Color3f eval(const BSDFQueryRecord &) const {
@@ -54,12 +60,18 @@ public:
         bRec.eta = 1.0f;
 		bRec.pdf = 1.0f;
 
-        return Color3f(1.0f) / Frame::cosTheta(bRec.wi);
+		Color3f f(1.0f);
+		if (m_hasTexture)
+			f = m_texture.getval(bRec.uv.x(), bRec.uv.y());
+
+        return f / Frame::cosTheta(bRec.wi);
     }
 
     virtual std::string toString() const {
         return "Mirror[]";
     }
+private:
+	std::string m_tex_filename;
 };
 
 NORI_REGISTER_CLASS(Mirror, "mirror");

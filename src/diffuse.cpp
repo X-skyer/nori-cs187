@@ -30,9 +30,17 @@ public:
     Diffuse(const PropertyList &propList) {
         m_albedo = propList.getColor("albedo", Color3f(0.5f));
 		m_type = BsdfType::BSDF_DIFFUSE;
+
+		// get texture if present
+		m_filename = propList.getString("filename", "none");
+		if (m_filename != "none")
+		{
+			m_hasTexture = true;
+			m_texture = Texture(m_filename);
+		}
     }
 
-    /// Evaluate the BRDF model
+	/// Evaluate the BRDF model
     Color3f eval(const BSDFQueryRecord &bRec) const {
         /* This is a smooth BRDF -- return zero if the measure
            is wrong, or when queried for illumination on the backside */
@@ -42,7 +50,17 @@ public:
             return Color3f(0.0f);
 
         /* The BRDF is simply the albedo / pi */
-        return m_albedo * INV_PI;
+		Color3f albedo;
+		if (m_hasTexture)
+		{
+			// get it from texture
+			albedo = m_texture.getval(bRec.uv.x(), bRec.uv.y());
+		}
+		else
+		{
+			albedo = m_albedo;
+		}
+		return albedo * INV_PI;
     }
 
     /// Compute the density of \ref sample() wrt. solid angles
@@ -93,12 +111,15 @@ public:
         return tfm::format(
             "Diffuse[\n"
             "  albedo = %s\n"
-            "]", m_albedo.toString());
+			"  file = %s\n"
+            "]", m_albedo.toString(),
+			m_filename);
     }
 
     EClassType getClassType() const { return EBSDF; }
 private:
     Color3f m_albedo;
+	std::string m_filename;
 };
 
 NORI_REGISTER_CLASS(Diffuse, "diffuse");

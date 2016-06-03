@@ -20,6 +20,8 @@
 #define __NORI_BSDF_H
 
 #include <nori/object.h>
+#include <nori/bitmap.h>
+#include <memory>
 
 NORI_NAMESPACE_BEGIN
 
@@ -135,6 +137,10 @@ public:
 	bool isDelta() const { return m_type == BsdfType::BSDF_MIRROR || m_type == BsdfType::BSDF_DIELECTRIC; }
 
 	BsdfType m_type;
+
+protected:
+	Texture					 m_texture;
+	bool					 m_hasTexture = false;
 };
 
 NORI_NAMESPACE_END

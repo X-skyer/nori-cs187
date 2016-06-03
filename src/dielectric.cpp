@@ -31,6 +31,13 @@ public:
         /* Exterior IOR (default: air) */
         m_extIOR = propList.getFloat("extIOR", 1.000277f);
 
+		m_tex_filename = propList.getString("filename", "none");
+		if (m_tex_filename != "none")
+		{
+			m_hasTexture = true;
+			m_texture = Texture(m_tex_filename);
+		}
+		
 		m_type = BsdfType::BSDF_DIELECTRIC;
     }
 
@@ -50,6 +57,12 @@ public:
 
 		// check if reflection or refraction
 		// if TIR, Fr = 1, and hence this branch is always taken.
+		Color3f f(1.0f);
+		if (m_hasTexture)
+		{
+			f = m_texture.getval(bRec.uv.x(), bRec.uv.y());
+		}
+
 		if (sample.x() < Fr)
 		{
 			bRec.wo = Vector3f(
@@ -61,7 +74,9 @@ public:
 			bRec.pdf = 1.0f;
 
 			// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
-			return (Color3f(1.0f) / fabsf(Frame::cosTheta(bRec.wi)));
+			
+
+			return f / fabsf(Frame::cosTheta(bRec.wi));
 		}
 		else
 		{
@@ -92,7 +107,7 @@ public:
 			// The (1-fr) term disappears because the probability of sampling this refraction is also (1-fr)
 			// Hence the numerator term and the denominator term cancel out.
 			//return (square(eta_t) / square(eta_i)) / (fabsf(Frame::cosTheta(bRec.wo)));
-			return 1.0f / (fabsf(Frame::cosTheta(bRec.wo)));
+			return f / (fabsf(Frame::cosTheta(bRec.wo)));
 		}
     }
 
@@ -106,6 +121,7 @@ public:
     }
 private:
     float m_intIOR, m_extIOR;
+	std::string m_tex_filename;
 };
 
 NORI_REGISTER_CLASS(Dielectric, "dielectric");

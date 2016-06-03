@@ -70,9 +70,12 @@ float RenderThread::getProgress() {
     else return 1.f;
 }
 
-static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block) {
+static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block, int spp, int run) {
     const Camera *camera = scene->getCamera();
     const Integrator *integrator = scene->getIntegrator();
+
+	// Although the renderer is calling it sample by sample per pixel, we can still pass in the spp coun
+	// create the stratification domains and during each run we make sure we correctly use the stratified positions
 
     Point2i offset = block.getOffset();
     Vector2i size  = block.getSize();
@@ -83,6 +86,8 @@ static void renderBlock(const Scene *scene, Sampler *sampler, ImageBlock &block)
     /* For each pixel and pixel sample sample */
     for (int y=0; y<size.y(); ++y) {
         for (int x=0; x<size.x(); ++x) {
+			
+			Point2i pixel = Point2i((x + offset.x()), (y + offset.y()));
             Point2f pixelSample = Point2f((float) (x + offset.x()), (float) (y + offset.y())) + sampler->next2D();
             Point2f apertureSample = sampler->next2D();
 
@@ -172,7 +177,7 @@ void RenderThread::renderScene(const std::string & filename) {
                         }
 
                         // Render all contained pixels
-                        renderBlock(m_scene, samplers.at(blockId).get(), block);
+                        renderBlock(m_scene, samplers.at(blockId).get(), block, numSamples, k);
 
                         // The image block has been processed. Now add it to the "big" block that represents the entire image
                         m_block.put(block);
@@ -180,10 +185,12 @@ void RenderThread::renderScene(const std::string & filename) {
                 };
 
                 /// Uncomment the following line for single threaded rendering
-                //map(range);
-
-                /// Default: parallel rendering
+#ifdef _NDEBUG
+                map(range);
+#else
+				/// Default: parallel rendering
                 tbb::parallel_for(range, map);
+#endif
 
                 blockGenerator.reset();
             }

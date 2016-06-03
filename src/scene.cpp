@@ -70,7 +70,7 @@ void Scene::addChild(NoriObject *obj) {
         case EEmitter:
 			// Add to the background emitter of the scene
 			// We know for a fact that there can be only one distant disk in a scene.
-			if (static_cast<Emitter*>(obj)->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK)
+			if (static_cast<Emitter*>(obj)->getEmitterType() == EmitterType::EMITTER_DISTANT_DISK || static_cast<Emitter*>(obj)->getEmitterType() == EmitterType::EMITTER_ENVIRONMENT)
 				m_bgEmitter = static_cast<Emitter*>(obj);
             m_emitters.push_back(static_cast<Emitter *>(obj));
             break;

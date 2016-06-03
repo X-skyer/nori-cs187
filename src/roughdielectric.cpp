@@ -37,7 +37,7 @@ public:
 		m_alpha = propList.getFloat("alpha");
 
 		// get distribution type
-		const std::string dist_type = propList.getString("distribution");
+		const std::string dist_type = propList.getString("distribution", "beckmann");
 		m_distribution = Distribution(dist_type, m_alpha);
 		
 		m_type = BsdfType::BSDF_ROUGHDIELECTRIC;
@@ -81,9 +81,22 @@ public:
 
 			float sign = bRec.wi.z() > 0.0f ? 1.0f : -1.0f;
 			bRec.wo = (eta * c - sign * sqrtf(1.0f + eta * (c * c - 1.0f)))*m - eta * bRec.wi;
+			if (!bRec.wo.allFinite())
+			{
+				std::cout << "Catching here" << std::endl;
+			}
 		}
 
-		return m.dot(bRec.wi) * m_distribution.G(bRec.wi, bRec.wo, m) / (bRec.wi.z() * m.z());
+		float G = m_distribution.G(bRec.wi, bRec.wo, m);
+		float denom = (bRec.wi.z() * m.z());
+		float f_d = m.dot(bRec.wi);
+		Color3f f = f_d * G / denom;
+
+		if (!f.isValid())
+		{
+			return Color3f(0.0f);
+		}
+		return f;
 	}
 
 	virtual std::string toString() const {
@@ -112,6 +125,13 @@ private:
 		float g = sqrtf(term);
 		float g_minus_c2 = (g - c) * (g - c);
 		float g_plus_c2 = (g + c) * (g + c);
+
+		float term_a = c * (g + c) - 1.0f;
+		float term_b = c * (g - c) + 1.0f;
+		float term_a2 = term_a * term_a;
+		float term_b2 = term_b * term_b;
+
+		return 0.5f * (g_minus_c2 / g_plus_c2) * (1.0f + term_a2 / term_b2);
 	}
 
 	Distribution m_distribution;

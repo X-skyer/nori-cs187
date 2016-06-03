@@ -51,7 +51,11 @@ public:
 
 			// Sample a reflection ray
 			BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
-			Color3f f = bsdf->sample(bRec, sampler->next2D());
+			Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
+			if (!f.isValid())
+			{
+				std::cout << "Catching here" << std::endl;
+			}
 			Vector3f reflected_dir = isect.toWorld(bRec.wo);
 
 			float cos_theta = fabsf(Frame::cosTheta(bRec.wo));

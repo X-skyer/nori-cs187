@@ -138,4 +138,66 @@ void Bitmap::saveToLDR(const std::string &filename) {
     stbi_write_png(filename.c_str(),cols(),rows(),3,rgb8.get(),3*cols());
 }
 
+
+// Texture file
+Texture::Texture(const std::string& filename) : Bitmap(filename)
+{
+	m_width = static_cast<int>(Base::cols());
+	m_height = static_cast<int>(Base::rows());
+	m_filename = filename;
+}
+
+Color3f Texture::getval(float x, float y) const
+{
+	// Assuming x and y to be 0 - 1 space
+	// if not clamp it
+	// for now
+	x = Clamp(x, 0.0f, 1.0f);
+	y = Clamp(y, 0.0f, 1.0f);
+
+	// for now return nearest neighbour
+	int pixel_x = static_cast<int>(floor(x * m_width));
+	int pixel_y = static_cast<int>(floor(y * m_height));
+	
+	if (pixel_x == m_width) pixel_x = m_width - 1;
+	if (pixel_y == m_height) pixel_y = m_height - 1;
+
+	return Base::operator()(pixel_y, pixel_x);
+	//return bilerp(x, y);
+}
+
+Color3f Texture::bilerp(float x, float y) const
+{
+	// find the nearest four corners
+	int pixel_x = static_cast<int>(floor(x * m_width));
+	int pixel_y = static_cast<int>(floor(y * m_height));
+
+ 	float s = x * m_width - pixel_x;
+	float t = y * m_height - pixel_y;
+
+	if (pixel_x == m_width) pixel_x = m_width - 1;
+	if (pixel_y == m_height) pixel_y = m_height - 1;
+
+	int x_1 = pixel_x >= m_width - 1 ? 0 : pixel_x + 1;
+	int y_1 = pixel_y >= m_height - 1 ? 0 : pixel_y + 1;
+
+	Point2i x00(pixel_x, pixel_y);
+	Point2i x01(x_1, pixel_y);
+	Point2i x10(pixel_x, y_1);
+	Point2i x11(x_1, y_1);
+
+	Color3f c00 = Base::operator()(x00.x(), x00.y());
+	Color3f c01 = Base::operator()(x01.x(), x01.y());
+	Color3f c10 = Base::operator()(x10.x(), x10.y());
+	Color3f c11 = Base::operator()(x11.x(), x11.y());
+
+	// bilerp it
+	return c00 * (1.0f - s) * (1.0f - t) + c01 * (1.0f - s) * t + c10 * s * (1.0f - t) + c11 * s * t;
+}
+
+Color3f Texture::trilerp(float x, float y) const
+{
+	return 0.0f;
+}
+
 NORI_NAMESPACE_END

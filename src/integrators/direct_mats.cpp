@@ -45,7 +45,8 @@ public:
 		// Construct a BSDF query record
 		BSDFQueryRecord bRec(its.toLocal(-ray.d));
 		bRec.p = its.p;
-			
+		bRec.uv = its.uv;
+		
 		Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
 		const Ray3f shadow_ray(its.p, its.toWorld(bRec.wo), Epsilon, INFINITY);
 		Intersection s_isect;

@@ -73,7 +73,7 @@ struct Distribution1D {
 
 	// Return the discrete pdf
 	float pdf(int index) const {
-		assert(index >= 0 && index < Count());
+		assert(index >= 0 && index < count());
 		return func[index] / (funcInt * count());
 	}
 

@@ -22,6 +22,7 @@
 #include <nori/bvh.h>
 #include <nori/emitter.h>
 
+
 NORI_NAMESPACE_BEGIN
 
 /**
@@ -138,6 +139,10 @@ public:
 
 	const Emitter* getBackgroundEmitter() const { return m_bgEmitter; }
 
+	const Medium* getSceneMedium() const {
+		return m_scene_medium;
+	}
+
 private:
     std::vector<Mesh *> m_meshes;
     std::vector<Emitter *> m_emitters;
@@ -146,6 +151,7 @@ private:
     Camera *m_camera = nullptr;
     BVH *m_bvh = nullptr;
 	Emitter* m_bgEmitter = nullptr;
+	Medium* m_scene_medium = nullptr;
 };
 
 NORI_NAMESPACE_END

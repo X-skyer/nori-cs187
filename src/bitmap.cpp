@@ -159,8 +159,8 @@ Color3f Texture::getval(float x, float y) const
 	int pixel_x = static_cast<int>(floor(x * m_width));
 	int pixel_y = static_cast<int>(floor(y * m_height));
 	
-	if (pixel_x == m_width) pixel_x = m_width - 1;
-	if (pixel_y == m_height) pixel_y = m_height - 1;
+	if (pixel_x >= m_width) pixel_x = m_width - 2;
+	if (pixel_y >= m_height) pixel_y = m_height - 2;
 
 	return Base::operator()(pixel_y, pixel_x);
 	//return bilerp(x, y);

@@ -180,6 +180,9 @@ public:
      * */
     EClassType getClassType() const { return EMesh; }
 
+	const Medium* get_internal_medium() const { return m_internal; }
+	const Medium* get_external_medium() const { return m_external; }
+
 	float pdf() const;
 
 protected:
@@ -193,7 +196,9 @@ protected:
     MatrixXf      m_UV;                  ///< Vertex texture coordinates
     MatrixXu      m_F;                   ///< Faces
     BSDF         *m_bsdf = nullptr;      ///< BSDF of the surface
-    Emitter    *m_emitter = nullptr;     ///< Associated emitter, if any
+    Emitter		 *m_emitter = nullptr;   ///< Associated emitter, if any
+	Medium       *m_internal = nullptr;
+	Medium       *m_external = nullptr;	 /// if the surface is enclosing a medium inside and outside we have to know about it
     BoundingBox3f m_bbox;                ///< Bounding box of the mesh
 	DiscretePDF	  m_pdfs;			     // We store pdfs for sampling the mesh.
 	float		  m_totalSurfaceArea;

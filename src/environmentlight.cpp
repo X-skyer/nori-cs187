@@ -15,7 +15,7 @@ public:
 
 	EnvironmentLight(const PropertyList& prop)
 	{
-		m_tex_filename = prop.getString("file");
+		m_tex_filename = prop.getString("filename");
 		m_texture = Texture(m_tex_filename);		
 		m_type = EmitterType::EMITTER_ENVIRONMENT;
 	}

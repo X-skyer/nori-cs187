@@ -185,12 +185,12 @@ void RenderThread::renderScene(const std::string & filename) {
                 };
 
                 /// Uncomment the following line for single threaded rendering
-#ifdef _NDEBUG
-                map(range);
-#else
+//#ifdef _NDEBUG
+  //              map(range);
+//#else
 				/// Default: parallel rendering
                 tbb::parallel_for(range, map);
-#endif
+//#endif
 
                 blockGenerator.reset();
             }

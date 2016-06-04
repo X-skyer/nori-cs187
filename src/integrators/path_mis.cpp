@@ -53,6 +53,7 @@ public:
 			pdf_e = eRec.pdf;
 			
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d), isect.toLocal(eRec.wi), ESolidAngle);
+			bRec.uv = isect.uv;
 			Color3f f = bsdf->eval(bRec);
 			pdf_m = bsdf->pdf(bRec);
 			if (pdf_e != 0.0f)
@@ -87,6 +88,7 @@ public:
 		if (!random_emitter->isDelta())
 		{
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d));
+			bRec.uv = isect.uv;
 			Color3f f = bsdf->sample(bRec, sampler->next2D());
 			float pdf_m = bRec.pdf;
 

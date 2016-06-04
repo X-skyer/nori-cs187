@@ -128,6 +128,7 @@ void RenderThread::renderScene(const std::string & filename) {
 
         /* Determine the filename of the output bitmap */
         std::string outputName = filename;
+		std::string tempName = filename;
         size_t lastdot = outputName.find_last_of(".");
         if (lastdot != std::string::npos)
             outputName.erase(lastdot, std::string::npos);
@@ -135,7 +136,7 @@ void RenderThread::renderScene(const std::string & filename) {
 
         /* Do the following in parallel and asynchronously */
         m_render_status = 1;
-        m_render_thread = std::thread([this,outputName] {
+        m_render_thread = std::thread([this,outputName, tempName] {
             const Camera *camera = m_scene->getCamera();
             Vector2i outputSize = camera->getOutputSize();
 

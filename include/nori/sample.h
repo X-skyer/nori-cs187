@@ -92,10 +92,10 @@ public:
 		// copy the data
 		pConditionalV.reserve(nv);
 		for (int v = 0; v < nv; ++v) {
-			// Compute conditional sampling distribution for $\tilde{v}$
+			// Compute conditional sampling distribution for the column with the row
 			pConditionalV.emplace_back(new Distribution1D(&data[v * nu], nu));
 		}
-		// Compute marginal sampling distribution $p[\tilde{v}]$
+		// Compute marginal sampling distribution corresponding row
 		std::vector<float> marginalFunc;
 		marginalFunc.reserve(nv);
 		for (int v = 0; v < nv; ++v)

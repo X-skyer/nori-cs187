@@ -2,6 +2,7 @@
 #include <nori/integrator.h>
 #include <nori/scene.h>
 #include <nori/sampler.h>
+#include <fstream>
 
 NORI_NAMESPACE_BEGIN
 
@@ -50,7 +51,17 @@ public:
 			
 			// Get the incoming radiance and create shadow ray.
 			// Assume Li has the pdf included in it.
+			//std::ofstream park_sampled_pts("park_sampled.csv");
+
 			Color3f Li = e->sample(eRec, sampler->next2D(), sampler->next1D());
+
+			/*
+			for (int i = 0; i < 512; i++)
+			{
+				Li = e->sample(eRec, sampler->next2D(), sampler->next1D());
+				park_sampled_pts << eRec.p.x() << "," << eRec.p.y() << std::endl;
+			}
+			*/			
 			
 			// Compute BSDF contribution for chosen direction.
 			BSDFQueryRecord bRec(its.toLocal(-ray.d), its.toLocal(eRec.wi), ESolidAngle);

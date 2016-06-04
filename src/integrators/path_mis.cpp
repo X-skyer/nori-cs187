@@ -192,9 +192,10 @@ public:
 			// Check for russian roulette
 			if (depth > m_rrStart)
 			{
-				if (sampler->next1D() < 0.5f)
+				float rrprob = throughput.getLuminance();
+				if (sampler->next1D() > rrprob)
 					break;
-				else throughput *= 2.0f;
+				else throughput /= rrprob;
 			}
 			else if (depth > m_maxDepth && m_maxDepth != -1)
 			{

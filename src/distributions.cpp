@@ -70,7 +70,8 @@ float Distribution::D(const Vector3f& m) const
 		case Distributions::BECKMANN:
 		{
 			float temp = Frame::tanTheta(m) / m_alpha, ct = Frame::cosTheta(m), ct2 = ct*ct;
-			return std::exp(-temp*temp) / (M_PI * m_alpha * m_alpha * ct2 * ct2);
+			float val = std::exp(-temp*temp) / (M_PI * m_alpha * m_alpha * ct2 * ct2);
+			return val;
 		}
 		case Distributions::GGX:
 		{
@@ -135,10 +136,13 @@ float Distribution::pdf(const Vector3f& m) const
 	{
 	case Distributions::BECKMANN:
 		ret = Warp::squareToBeckmannPdf(m, m_alpha);
+		break;
 	case Distributions::GGX:
 		ret = Warp::squareToGgxPdf(m, m_alpha);
+		break;
 	case Distributions::PHONG:
 		ret = Warp::squareToPhongPdf(m, m_alpha);
+		break;
 	}
 	return ret;
 }
@@ -150,41 +154,58 @@ float Distribution::pdf(const Vector3f& m, float alpha) const
 	{
 	case Distributions::BECKMANN:
 		ret = Warp::squareToBeckmannPdf(m, alpha);
+		break;
 	case Distributions::GGX:
 		ret = Warp::squareToGgxPdf(m, alpha);
+		break;
 	case Distributions::PHONG:
 		ret = Warp::squareToPhongPdf(m, alpha);
+		break;
 	}
 	return ret;
 }
 
 float Distribution::G(const Vector3f& i, const Vector3f& o, const Vector3f& m) const
 {
-	float g = 0.0f;
+	float g = 0.0f, g1 = 0.0f, g2 = 0.0f;
 	switch (m_distribution)
 	{
 	case Distributions::BECKMANN:
-		g = smithBeckmannG1(i, m) * smithBeckmannG1(o, m);
+		g1 = smithBeckmannG1(i, m);
+		g2 = smithBeckmannG1(o, m);
+		g = g1 * g2;
+		break;
 	case Distributions::PHONG:
 		g = smithPhongG1(i, m) * smithPhongG1(o, m);
+		break;
 	case Distributions::GGX:
 		g = smithGgxG1(i, m) * smithGgxG1(o, m);
+		break;
 	}
-
+	if (g < 0.0f)
+	{
+		std::cout << "Something in G is wrong" << std::endl;
+	}
 	return g;
 }
 
 float Distribution::G(const Vector3f& i, const Vector3f& o, const Vector3f& m, float alpha) const
 {
 	float g = 0.0f;
+	float g1 = 0.0f, g2 = 0.0f;
 	switch (m_distribution)
 	{
 	case Distributions::BECKMANN:
-		g = smithBeckmannG1(i, m, alpha) * smithBeckmannG1(o, m, alpha);
+		g1 = smithBeckmannG1(i, m, alpha);
+		g2 = smithBeckmannG1(o, m, alpha);
+		g = g1 * g2;
+		break;
 	case Distributions::PHONG:
 		g = smithPhongG1(i, m, alpha) * smithPhongG1(o, m, alpha);
+		break;
 	case Distributions::GGX:
 		g = smithGgxG1(i, m, alpha) * smithGgxG1(o, m, alpha);
+		break;
 	}
 
 	return g;
@@ -202,6 +223,8 @@ float Distribution::smithBeckmannG1(const Vector3f& v, const Vector3f& m) const
 	if (m.dot(v) * Frame::cosTheta(v) <= 0)
 		return 0.0f;
 
+	if (m.dot(v) / Frame::cosTheta(v) <= 0.0f) return 0.0f;
+
 	float a = 1.0f / (m_alpha * tanTheta);
 	if (a >= 1.6f)
 		return 1.0f;
@@ -214,8 +237,13 @@ float Distribution::smithBeckmannG1(const Vector3f& v, const Vector3f& m) const
 
 	/* Use a fast and accurate (<0.35% rel. error) rational
 	approximation to the shadowing-masking function */
-	return (3.535f * a + 2.181f * a2)
+	float val = (3.535f * a + 2.181f * a2)
 		/ (1.0f + 2.276f * a + 2.577f * a2);
+	if (val < 0.0f)
+	{
+		std::cout << "Something is fishing inside deep G" << std::endl;
+	}
+	return val;
 }
 
 float Distribution::smithBeckmannG1(const Vector3f & v, const Vector3f & m, float alpha) const

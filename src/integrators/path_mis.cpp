@@ -89,7 +89,7 @@ public:
 		{
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d));
 			bRec.uv = isect.uv;
-			Color3f f = bsdf->sample(bRec, sampler->next2D());
+			Color3f f = bsdf->sample(bRec, sampler->next2D(), sampler->next1D());
 			float pdf_m = bRec.pdf;
 
 			if (!f.isZero() && pdf_m != 0.0f && !isnan(pdf_m))

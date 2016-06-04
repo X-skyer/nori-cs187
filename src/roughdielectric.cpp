@@ -71,12 +71,18 @@ public:
 				
 		float sign = bRec.wi.z() < 0.0f ? -1.0f : 1.0f;
 		Normal3f w_h = sign * (bRec.wi + bRec.wo).normalized();
-		if (w_h.isZero()) fr = 0.0f;
-		float D = m_distribution.D(w_h);
-		Color3f F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
-		float G = m_distribution.G(bRec.wi, bRec.wo, w_h);
+		Vector3f half_vector = bRec.wo + bRec.wi;
+		if (half_vector.norm() < 1e-3f)
+		{
+			fr = 0.0f;
+		}
 
-		fr = F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+		if (w_h.isZero()) fr = 0.0f;
+		float D_r = m_distribution.D(w_h);
+		Color3f F_r = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
+		float G_r = m_distribution.G(bRec.wi, bRec.wo, w_h);
+		
+		fr = F_r * D_r * G_r / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
 		if (isnan(fr.x()) || isnan(fr.y()) || isnan(fr.z())) fr = Color3f(0.0f);		// might arise due 0/0
 
 		// Transmission
@@ -89,7 +95,9 @@ public:
 		float term = fabsf(bRec.wi.dot(w_ht)) * fabsf(bRec.wo.dot(w_ht)) / (fabsf(bRec.wi.z()) * fabsf(bRec.wo.z()));
 		float fr_t = 1.0f - fresnel(w_ht.dot(bRec.wi), m_extIOR, m_intIOR);
 		float denom = eta_i * bRec.wi.dot(w_ht) + eta_t * bRec.wo.dot(w_ht);
-		ft = term * eta_t * eta_t * fr_t * m_distribution.G(bRec.wi, bRec.wo, w_ht) * m_distribution.D(w_ht) / (denom * denom);
+		float G_t = m_distribution.G(bRec.wi, bRec.wo, w_ht);
+		float D_t = m_distribution.D(w_ht);
+		ft = term * eta_t * eta_t * fr_t * G_t * D_t / (denom * denom);
 		if (isnan(ft.x()) || isnan(ft.y()) || isnan(ft.z())) ft = Color3f(0.0f);
 
 		Color3f total = fr + ft;
@@ -98,11 +106,14 @@ public:
 			std::cout << "INSIDE EVAL : " << std::endl;
 			std::cout << "--------------------------" << std::endl;
 			std::cout << " fr : " << fr << std::endl;
-			std::cout << " F : " << F << std::endl;
-			std::cout << " D : " << D << std::endl;
-			std::cout << " G : " << G << std::endl;
-			
+			std::cout << " F : " << F_r << std::endl;
+			std::cout << " D : " << D_r << std::endl;
+			std::cout << " G : " << G_r << std::endl;
+			std::cout << "--------------------------" << std::endl;			
 			std::cout << " ft : " << ft;
+			std::cout << " F : " << fr_t << std::endl;
+			std::cout << " D : " << D_t << std::endl;
+			std::cout << " G : " << G_t << std::endl;
 		}
 		return total;
 	}

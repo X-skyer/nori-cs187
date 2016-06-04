@@ -185,7 +185,7 @@ void RenderThread::renderScene(const std::string & filename) {
                 };
 
                 /// Uncomment the following line for single threaded rendering
-#ifdef _NDEBUG
+#ifdef _DEBUG
 	              map(range);
 #else
 				/// Default: parallel rendering

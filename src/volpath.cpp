@@ -243,10 +243,10 @@ public:
 				Point3f scattered_pt = traced_ray(mRec.t);
 
 				// Compute scattering term
-				//L += throughput * LmSingleScatter(scene, sampler, traced_ray, mRec, scattered_pt) / mRec.pdf_success;
+				Color3f debug = throughput * LmSingleScatter(scene, sampler, traced_ray, mRec, scattered_pt) / mRec.pdf_success;
 
 				// update throughput
-				throughput *= mRec.transmittance / mRec.pdf_success;
+				throughput *= mRec.transmittance * mRec.m_sigmaS / mRec.pdf_success;
 
 				// sample a next direction
 				Vector3f scatter_dir;
@@ -307,6 +307,12 @@ public:
 				traced_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
 				depth++;
 			}
+
+			// update the ray params
+			if (scene->rayIntersect(traced_ray, isect))
+				traced_ray.maxt = isect.t;
+			else
+				break;
 		}
 
 		return L;

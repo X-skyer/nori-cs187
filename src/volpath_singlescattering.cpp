@@ -143,7 +143,7 @@ public:
 		// Choose a point on the light source
 		{
 			EmitterQueryRecord eRec;
-			float pdf_e, pdf_m;
+			float pdf_e;
 			eRec.ref = ray(rand_distance);
 
 			Color3f Li = emitter->sample(eRec, sampler->next2D(), sampler->next1D());
@@ -306,7 +306,7 @@ public:
 
 	std::string toString() const
 	{
-		return tfm::format("Volpath Integrator["
+		return tfm::format("VolpathSingle Integrator["
 			"Max Depth : %d\n"
 			"Russian Roulette Start : %d\n]",
 			m_maxDepth,

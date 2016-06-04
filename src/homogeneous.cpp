@@ -57,11 +57,12 @@ public:
 		mRec.pdf_failure /= 3.0f;
 		mRec.pdf_success /= 3.0f;
 		mRec.transmittance = eval_transmittance(sampled_distance);
+		mRec.phase_function = m_phase_funtion;
 		return status;
 	}
 
 	// We assume that ray extends only within the medium
-	Color3f eval(const Ray3f& ray, MediumSamplingRecord& mRec) const
+	void eval(const Ray3f& ray, MediumSamplingRecord& mRec) const
 	{
 		float distance = ray.maxt - ray.mint;
 
@@ -81,6 +82,7 @@ public:
 		mRec.m_sigmaS = m_sigmaS;
 		mRec.medium = this;
 		mRec.transmittance = eval_transmittance(distance);
+		mRec.phase_function = m_phase_funtion;
 	}
 
 	// For now we assume medium is fully surrounding everything
@@ -113,9 +115,7 @@ public:
 	}
 
 private:
-
-	
 };
 
-//NORI_REGISTER_CLASS(HomogeneousMedium, "homogeneous");
+NORI_REGISTER_CLASS(HomogeneousMedium, "homogeneous");
 NORI_NAMESPACE_END

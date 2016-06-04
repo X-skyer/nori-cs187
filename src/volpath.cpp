@@ -127,7 +127,8 @@ public:
 
 		scene->rayIntersect(traced_ray, isect);
 		const Medium* m = scene->getSceneMedium();
-
+		depth++;
+		
 		while (depth < m_maxDepth || m_maxDepth == -1)
 		{
 			// check for medium interaction or surface interaction
@@ -157,7 +158,7 @@ public:
 				// check for visibility
 				if (!scene->rayIntersect(Ray3f(mRec.p, eRec.wi, Epsilon, eRec.dist * (1.0f - Epsilon))))
 				{
-					L += throughput * pfun_value * L_sampled * transmittance;
+					L += throughput * mRec.m_sigmaS * pfun_value * L_sampled * transmittance;
 				}				
 
 				// MIS with phase function
@@ -167,6 +168,7 @@ public:
 
 				traced_ray = Ray3f(mRec.p, pRec.wo);
 				scene->rayIntersect(traced_ray, isect);
+				depth++;
 			}
 			else
 			{
@@ -224,6 +226,8 @@ public:
 				depth++;
 			}
 		}
+
+		return L;
 	}
 
 	std::string toString() const
@@ -241,4 +245,5 @@ private:
 	int m_rrStart;
 };
 
+NORI_REGISTER_CLASS(Volpath, "volpath");
 NORI_NAMESPACE_END

@@ -36,7 +36,6 @@ Scene::~Scene() {
     delete m_sampler;
     delete m_camera;
     delete m_integrator;
-	delete m_scene_medium->m_phase_funtion;
 	delete m_scene_medium;
 }
 

@@ -243,9 +243,12 @@ public:
 				Point3f scattered_pt = traced_ray(mRec.t);
 
 				// Compute scattering term
-				Color3f debug = throughput * LmSingleScatter(scene, sampler, traced_ray, mRec, scattered_pt) / mRec.pdf_success;
+				// SingleScatter includes all transmittance terms for this scattering event.
+				// So don't bother adding it here
+				L += throughput * mRec.m_sigmaS * LmSingleScatter(scene, sampler, traced_ray, mRec, scattered_pt) / mRec.pdf_success;
 
 				// update throughput
+				// however throughput has to be updated correctly.
 				throughput *= mRec.transmittance * mRec.m_sigmaS / mRec.pdf_success;
 
 				// sample a next direction
@@ -310,9 +313,7 @@ public:
 
 			// update the ray params
 			if (scene->rayIntersect(traced_ray, isect))
-				traced_ray.maxt = isect.t;
-			else
-				break;
+				traced_ray.maxt = isect.t;			
 		}
 
 		return L;

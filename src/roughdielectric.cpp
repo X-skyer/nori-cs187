@@ -67,15 +67,44 @@ public:
 		return fr;// +ft;*/
 		
 		//return 0.0f;
-		
+		Color3f fr, ft;
+				
 		float sign = bRec.wi.z() < 0.0f ? -1.0f : 1.0f;
 		Normal3f w_h = sign * (bRec.wi + bRec.wo).normalized();
-		if (w_h.isZero()) return 0.0f;
+		if (w_h.isZero()) fr = 0.0f;
 		float D = m_distribution.D(w_h);
 		Color3f F = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
 		float G = m_distribution.G(bRec.wi, bRec.wo, w_h);
 
-		return F * D * G / (4 * (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+		fr = F * D * G / (4 * fabsf(Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
+		if (isnan(fr.x()) || isnan(fr.y()) || isnan(fr.z())) fr = Color3f(0.0f);		// might arise due 0/0
+
+		// Transmission
+		float eta_i = m_extIOR, eta_t = m_intIOR;
+		if (bRec.wi.z() < 0.0f)
+			std::swap(eta_i, eta_t);
+
+		Vector3f w_ht = -(eta_i * bRec.wi + eta_t * bRec.wo).normalized();
+
+		float term = fabsf(bRec.wi.dot(w_ht)) * fabsf(bRec.wo.dot(w_ht)) / (fabsf(bRec.wi.z()) * fabsf(bRec.wo.z()));
+		float fr_t = 1.0f - fresnel(w_ht.dot(bRec.wi), m_extIOR, m_intIOR);
+		float denom = eta_i * bRec.wi.dot(w_ht) + eta_t * bRec.wo.dot(w_ht);
+		ft = term * eta_t * eta_t * fr_t * m_distribution.G(bRec.wi, bRec.wo, w_ht) * m_distribution.D(w_ht) / (denom * denom);
+		if (isnan(ft.x()) || isnan(ft.y()) || isnan(ft.z())) ft = Color3f(0.0f);
+
+		Color3f total = fr + ft;
+		if (!total.isValid())
+		{
+			std::cout << "INSIDE EVAL : " << std::endl;
+			std::cout << "--------------------------" << std::endl;
+			std::cout << " fr : " << fr << std::endl;
+			std::cout << " F : " << F << std::endl;
+			std::cout << " D : " << D << std::endl;
+			std::cout << " G : " << G << std::endl;
+			
+			std::cout << " ft : " << ft;
+		}
+		return total;
 	}
 
 	virtual float pdf(const BSDFQueryRecord& bRec) const {
@@ -103,44 +132,110 @@ public:
 		Vector3f w_hr = sign * (bRec.wo + bRec.wi).normalized();
 		float jacobian_r = 0.25f / fabsf(bRec.wo.dot(w_hr));
 		float pdf_r = m_distribution.D(w_hr) * jacobian_r;
-		return pdf_r;
+		
+		float eta_i = m_extIOR, eta_t = m_intIOR;
+		if (bRec.wi.z() < 0.0f)
+			std::swap(eta_i, eta_t);
+
+		Vector3f w_ht = -(eta_i * bRec.wi + eta_t * bRec.wo).normalized();
+		float denom = eta_i * bRec.wi.dot(w_ht) + eta_t * bRec.wo.dot(w_ht);
+		float jacobian_t = eta_t * eta_t * bRec.wo.dot(w_ht) / (denom * denom);
+		float pdf_t = m_distribution.D(w_ht) * jacobian_t;
+
+		return pdf_t + pdf_r;
 	}
 
 	virtual Color3f sample(BSDFQueryRecord &bRec, const Point2f &_sample, float optional_u) const 
 	{
-		bRec.measure = ESolidAngle;
-
 		float pdf;
 		Normal3f w_h = m_distribution.sample(_sample, pdf);
 		if (pdf == 0.0f) return 0.0f;
-		bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
+		
+		// compute Fresnel
+		float Fr = fresnel(w_h.dot(bRec.wi), m_extIOR, m_intIOR);
 
-		// check for sampled direction
-		Vector3f half_vector = bRec.wo + bRec.wi;
-		if (half_vector.norm() < 1e-3f)
+		if (optional_u < Fr)
 		{
-			return 0.0f;
-		}
+			bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
+			bRec.measure = ESolidAngle;
 
-		float jacobian = 0.25f / fabsf(w_h.dot(bRec.wo));
-		bRec.pdf = pdf * jacobian;
-		Color3f e = eval(bRec);
-		Color3f f = eval(bRec) / bRec.pdf;
-		if (!f.isValid())
-		{
-			std::cout << "Catching here" << std::endl;
-			std::cout << "Wi : " << std::endl;
-			std::cout << bRec.wi << std::endl;
-			std::cout << "Wo : " << std::endl;
-			std::cout << bRec.wo << std::endl;
-			std::cout << "e " << e << std::endl;
-			std::cout << "pdf : " << bRec.pdf << std::endl;
-			std::cout << "jacobian" << std::endl;
-			Vector3f w_hr = (bRec.wi + bRec.wo);
-			std::cout << w_hr.x() << "," << w_hr.y() << w_hr.z() << std::endl;
-			std::cout << "Norm : " << w_hr.norm();
+			// check for sampled direction
+			Vector3f half_vector = bRec.wo + bRec.wi;
+			if (half_vector.norm() < 1e-3f)
+			{
+				return 0.0f;
+			}
+
+			float jacobian = 0.25f / fabsf(w_h.dot(bRec.wo));
+			bRec.pdf = pdf * jacobian;
+			Color3f e = eval(bRec);
+			Color3f f = eval(bRec) / bRec.pdf;
+			if (!f.isValid())
+			{
+				std::cout << "Catching here in REFL BRANCH" << std::endl;
+				std::cout << "Wi : " << std::endl;
+				std::cout << bRec.wi << std::endl;
+				std::cout << "Wo : " << std::endl;
+				std::cout << bRec.wo << std::endl;
+				std::cout << "e " << e << std::endl;
+				std::cout << "pdf : " << bRec.pdf << std::endl;
+				std::cout << "jacobian" << std::endl;
+				Vector3f w_hr = (bRec.wi + bRec.wo);
+				std::cout << w_hr.x() << "," << w_hr.y() << w_hr.z() << std::endl;
+				std::cout << "Norm : " << w_hr.norm();
+			}
+			return f;
 		}
-		return f;
+		else
+		{
+			bool entering = Frame::cosTheta(bRec.wi) > 0.0f;
+			float eta_i = m_extIOR;
+			float eta_t = m_intIOR;
+
+			if (!entering)
+				std::swap(eta_i, eta_t);
+
+			float eta = eta_i / eta_t;
+			float c = bRec.wi.dot(w_h);
+
+			float sign = bRec.wi.z() > 0.0f ? 1.0f : -1.0f;
+			float discriminant = 1.0f + eta * (c * c - 1.0f);
+			if (discriminant < 0.0f)
+			{
+				// TIR BRANCH
+				// FOR NOW ZERO
+				return Color3f(0.0f);
+			}
+
+			bRec.wo = (eta * c - sign * sqrtf(1.0f + eta * (c * c - 1.0f)))*w_h - eta * bRec.wi;
+
+			Vector3f w_ht = -(eta_i * bRec.wi + eta_t * bRec.wo).normalized();
+			float denom = eta_i * bRec.wi.dot(w_ht) + eta_t * bRec.wo.dot(w_ht);
+			float jacobian_t = eta_t * eta_t * fabsf(bRec.wo.dot(w_ht)) / (denom * denom);
+			float pdf_t = m_distribution.D(w_ht) * jacobian_t;
+			if (pdf_t == 0.0f) return 0.0f;
+
+			bRec.pdf = pdf_t;
+			Color3f e = eval(bRec);
+			Color3f f = e / pdf_t;
+			if (!f.isValid())
+			{
+				std::cout << "Catching here in REFR BRANCH" << std::endl;
+				std::cout << "Wi : " << std::endl;
+				std::cout << bRec.wi << std::endl;
+				std::cout << "Wo : " << std::endl;
+				std::cout << bRec.wo << std::endl;
+				std::cout << "e " << e << std::endl;
+				std::cout << "pdf : " << bRec.pdf << std::endl;
+				std::cout << "jacobian" << jacobian_t << std::endl;
+				Vector3f w_hr = (bRec.wi + bRec.wo);
+				std::cout << w_hr.x() << "," << w_hr.y() << w_hr.z() << std::endl;
+				std::cout << "Norm : " << w_hr.norm() << std::endl;
+				std::cout << "F : " << f << std::endl;
+			}
+			return f;
+		}
+		
 	}
 
 	virtual std::string toString() const {

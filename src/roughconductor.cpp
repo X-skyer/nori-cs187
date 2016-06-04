@@ -89,8 +89,9 @@ public:
 
 		float pdf;
 		Normal3f w_h = m_distribution.sample(_sample, pdf);
+		if (pdf == 0.0f) return 0.0f;
 		bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
-		float jacobian = 0.25f / (w_h.dot(bRec.wo));
+		float jacobian = 0.25f / fabsf(w_h.dot(bRec.wo));
 		bRec.pdf = pdf * jacobian;
 		return eval(bRec) / bRec.pdf;
 	}

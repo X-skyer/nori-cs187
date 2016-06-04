@@ -32,6 +32,7 @@ public:
 		{
 			// failure because sampled a point more than the nearest surface 
 			status = false;
+			sampled_distance = distance_to_surface;
 		}
 		else
 		{

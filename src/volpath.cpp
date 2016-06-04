@@ -21,6 +21,9 @@ public:
 	{
 		Color3f L_ems(0.0f), L_mats(0.0f);
 		const BSDF* bsdf = isect.mesh->getBSDF();
+		float distance_to_light;
+		const Medium* m = scene->getSceneMedium();
+		Color3f transmittance(1.0);
 
 		// Choose a light
 		float pdf = 1.0f / scene->getLights().size();
@@ -46,12 +49,15 @@ public:
 
 				// Compute lighting
 				L_ems = f * Li * fabsf(isect.shFrame.n.dot(eRec.wi));
+				distance_to_light = eRec.dist;
 
 				// Compute shadow ray only when 
 				if (L_ems.isValid() && !L_ems.isZero())
 				{
 					// Trace a shadow ray only now
-					float V = scene->rayIntersect(Ray3f(isect.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist)) ? 0.0f : 1.0f;
+					Ray3f shadow_ray(isect.p, eRec.wi, Epsilon, (1.0f - Epsilon) * eRec.dist);
+					float V = scene->rayIntersect(shadow_ray) ? 0.0f : 1.0f;
+					transmittance = m->eval_transmittance(shadow_ray);
 					L_ems *= V;
 				}
 				else
@@ -111,7 +117,7 @@ public:
 		}
 
 		// Divide by the pdf of choosing the random light
-		return (L_ems + L_mats) / pdf;
+		return transmittance * (L_ems + L_mats) / pdf;
 	}
 
 	Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &ray) const
@@ -123,9 +129,13 @@ public:
 				
 		Ray3f traced_ray = ray;
 		Color3f throughput(1.0f);
-		bool wasLastBounceSpecular = true;
+		
+		bool intersected = scene->rayIntersect(traced_ray, isect);
 
-		scene->rayIntersect(traced_ray, isect);
+		// update the ray params for correct parametric range
+		if (intersected)
+			traced_ray.maxt = isect.t;
+
 		const Medium* m = scene->getSceneMedium();
 		depth++;
 		
@@ -162,15 +172,18 @@ public:
 				}				
 
 				// MIS with phase function
-
-				// sample the phase function for next bounce
-				float phase_value = pfun->sample(pRec, sampler->next2D());
+				// sample phase function for next bounce
+				pfun_value = pfun->sample(pRec, sampler->next2D());
 
 				traced_ray = Ray3f(mRec.p, pRec.wo);
-				scene->rayIntersect(traced_ray, isect);
+				throughput *= pfun_value;
+
+				intersected = scene->rayIntersect(traced_ray, isect);
+				if (intersected)
+					traced_ray.maxt = isect.t;
 				depth++;
 			}
-			else
+			else if(intersected)
 			{
 				// Surface interaction
 				throughput *= mRec.transmittance / mRec.pdf_failure;
@@ -183,25 +196,30 @@ public:
 					eRec.ref = traced_ray.o;
 					eRec.wi = traced_ray.d;
 					eRec.n = isect.shFrame.n;
-					L += throughput * emitter->eval(eRec);
+
+					Color3f transmittance(1.0f);
+					if (m != nullptr)
+					{
+						transmittance = m->eval_transmittance(ray);
+					}					
+
+					L += throughput * transmittance * emitter->eval(eRec);
 				}
 
 				const BSDF* bsdf = isect.mesh->getBSDF();
 
 				// NEE
+				Color3f transmittance = m->eval_transmittance(traced_ray);
 				Color3f Li = LiAttenuatedDirect(scene, sampler, traced_ray, isect);
 				Color3f debug = throughput * Li;
-				L += throughput * Li;
+				L += throughput * transmittance * Li;
 
 				// Sample a reflection ray
 				BSDFQueryRecord bRec(isect.toLocal(-traced_ray.d));
 				Color3f f = bsdf->sample(bRec, sampler->next2D());
 				Vector3f reflected_dir = isect.toWorld(bRec.wo);
 
-				throughput *= f * fabsf(Frame::cosTheta(bRec.wo));
-
-				// Check if specular bounce
-				wasLastBounceSpecular = bsdf->isDelta();
+				throughput *= f * transmittance * fabsf(Frame::cosTheta(bRec.wo));
 
 				// Check if we've reached a zero throughput. No point in proceeding further.
 				if (throughput.isZero())
@@ -223,8 +241,13 @@ public:
 
 				// Propogate
 				traced_ray = Ray3f(isect.p, reflected_dir, Epsilon, INFINITY);
+				intersected = scene->rayIntersect(traced_ray, isect);
+				if (intersected)
+					traced_ray.maxt = isect.t;
 				depth++;
 			}
+			else
+				break;
 		}
 
 		return L;

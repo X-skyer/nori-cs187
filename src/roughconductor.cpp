@@ -88,7 +88,7 @@ public:
 		bRec.measure = ESolidAngle;		
 
 		float pdf;
-		Normal3f w_h = m_distribution.sample(_sample, pdf);		
+		Normal3f w_h = m_distribution.sample(_sample, pdf);
 		bRec.wo = 2.0f * w_h.dot(bRec.wi) * w_h - bRec.wi;
 		float jacobian = 0.25f / (w_h.dot(bRec.wo));
 		bRec.pdf = pdf * jacobian;

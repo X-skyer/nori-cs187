@@ -74,13 +74,10 @@ public:
 			bRec.pdf = 1.0f;
 
 			// The wi can be under the surface and hence negative. however, we need to take only the absolute value.
-			
-
 			return f / fabsf(Frame::cosTheta(bRec.wi));
 		}
 		else
 		{
-
 			// do refraction
 			bool entering = Frame::cosTheta(bRec.wi) > 0.0f;
 			float eta_i = m_extIOR;
@@ -107,7 +104,7 @@ public:
 			// The (1-fr) term disappears because the probability of sampling this refraction is also (1-fr)
 			// Hence the numerator term and the denominator term cancel out.
 			//return (square(eta_t) / square(eta_i)) / (fabsf(Frame::cosTheta(bRec.wo)));
-			return f / (fabsf(Frame::cosTheta(bRec.wo)));
+			return (square(eta_t) / square(eta_i)) * f / (fabsf(Frame::cosTheta(bRec.wo)));
 		}
     }
 

@@ -96,6 +96,7 @@ add_executable(nori
   src/integrators/path_mats.cpp
   src/integrators/path_mis.cpp
   src/main.cpp
+  src/medium.cpp
   src/mesh.cpp
   src/normals.cpp
   src/obj.cpp

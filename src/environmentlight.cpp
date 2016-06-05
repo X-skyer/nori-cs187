@@ -96,8 +96,8 @@ public:
 		Vector3f local_dir = m_worldToLocal * world_dir;
 
 		// compute theta and phi
-		float theta = std::acos(clamp(Frame::cosTheta(local_dir), -1.0f, 1.0f));
-		float phi = std::atan2f(local_dir.x(), local_dir.y());
+		float theta = acos(clamp(Frame::cosTheta(local_dir), -1.0f, 1.0f));
+		float phi = atan2f(local_dir.x(), local_dir.y());
 
 		// compute the corresponding pixel coords
 		// we assume height ranges from 0 -> pi/2

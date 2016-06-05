@@ -235,7 +235,7 @@ public:
 		else
 			return L;			// for now dont trace these rays.
 		
-		while (depth < m_maxDepth || depth == -1)
+		while (depth < m_maxDepth || m_maxDepth == -1)
 		{
 			if (m->sample_distance(traced_ray, mRec, sampler->next2D()))
 			{

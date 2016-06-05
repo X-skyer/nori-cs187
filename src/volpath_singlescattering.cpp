@@ -44,7 +44,7 @@ public:
 			BSDFQueryRecord bRec(isect.toLocal(-ray.d), isect.toLocal(eRec.wi), ESolidAngle);
 			Color3f f = bsdf->eval(bRec);
 			pdf_m = bsdf->pdf(bRec);
-			if (pdf_e != 0.0f)
+			if (pdf_e != 0.0f && !isnan(pdf_m))
 			{
 				float mis = pdf_e / (pdf_m + pdf_e);
 
@@ -66,7 +66,7 @@ public:
 					L_ems = Color3f(0.0f);
 
 
-				if (!random_emitter->isDelta())
+				if (!random_emitter->isDelta() && !isnan(mis))
 				{
 					// The BSDF has no way of generating a direction that would hit this light
 					// Hence multiply by MIS value only when 
@@ -112,6 +112,7 @@ public:
 							float pdf_e = light->pdf(eRec);
 							mis = pdf_m / (pdf_m + pdf_e);
 						}
+						if (isnan(mis)) mis = 0.0f;
 						
 						transmittance = m->eval_transmittance(next_bounce_ray);
 						L_mats = transmittance * (f * Li * fabsf(Frame::cosTheta(bRec.wo)));
@@ -122,7 +123,9 @@ public:
 		}
 
 		// Divide by the pdf of choosing the random light
-		return ((L_ems + L_mats) / pdf);
+		if(pdf != 0.0f)
+			return ((L_ems + L_mats) / pdf);
+		else return 0.0f;
 	}
 
 	// compute scattering in a random distance along the camera ray
@@ -151,7 +154,7 @@ public:
 
 			float phase_fun = INV_FOURPI;
 			float pdf_phase = INV_FOURPI;
-			if (pdf_e != 0.0f)
+			if (pdf_e != 0.0f && !isnan(pdf_e))
 			{
 				float mis = pdf_e / (pdf_phase + pdf_e);
 
@@ -171,7 +174,7 @@ public:
 				else
 					Lm_emit = Color3f(0.0f);
 				
-				if (!emitter->isDelta())
+				if (!emitter->isDelta() && !isnan(mis))
 				{
 					// The phase function has no way of generating a direction that would hit this light
 					// Hence multiply by MIS value only when 

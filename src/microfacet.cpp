@@ -97,7 +97,7 @@ public:
 		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
 
 		Color3f specular = m_ks * F * D * G / (4 * (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
-
+		if (!specular.isValid) specular = Color3f(0.0f);
 		return specular + diffuse;
 	}
 
@@ -110,6 +110,8 @@ public:
 		Normal3f w_h = (bRec.wi + bRec.wo).normalized();
 		float jacobian = 0.25f / (w_h.dot(bRec.wo));
 		float spdf = m_ks * Warp::squareToBeckmannPdf(w_h, m_alpha) * jacobian;
+		if (isnan(dpdf)) dpdf = 0.0f;
+		if (isnan(spdf)) spdf = 0.0f;
 		return spdf + dpdf;
     }
 
@@ -133,6 +135,7 @@ public:
 			//float _pdf = pdf(bRec);
 			bRec.pdf = _pdf;
 
+			if (_pdf == 0.0f) return 0.0f;
 			return eval(bRec) / _pdf;
 		}
 		else
@@ -143,6 +146,7 @@ public:
 			float _pdf = (1.0f - m_ks) * Warp::squareToCosineHemispherePdf(bRec.wo);
 			//float _pdf = pdf(bRec);
 			bRec.pdf = _pdf;
+			if (_pdf == 0.0f) return 0.0f;
 			return eval(bRec) / _pdf;
 		}
     }

@@ -2,6 +2,7 @@
 #include <nori/bitmap.h>
 #include <nori/frame.h>
 #include <nori/sample.h>
+#include <cmath>
 
 NORI_NAMESPACE_BEGIN
 

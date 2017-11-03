@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- # Main Scene File -->
+<scene>
+	
+	<integrator type="volpath_single"/>
+	
+	<sampler type="independent">
+		<integer name="sampleCount" value="20000"/>
+	</sampler>
+	
+	<medium type="homogeneous">
+		<phase type="isotropic"/>
+		<color name="sigmaA" value="0.7, 0.7, 0.7"/>
+		<color name="sigmaS" value="0.1, 0.1, 0.1"/>
+	</medium>
+	
+	
+	<camera type="perspective">
+		<transform name="toWorld">
+			<lookat target="-0.000000, 0.6000000, 1.000000" origin="-0.000000, 0.6000000, 7.000000" up="0.000000, 1.000000, 0.000000"/>
+		</transform>
+		<float name="fov" value="49.134343"/>
+		<integer name="width" value="1920"/>
+		<integer name="height" value="1080"/>
+		<float name="radius" value = "0.03"/>
+		<float name="focalLength" value = "9.46"/>
+	</camera>
+
+	<!-- LIGHTS -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/light.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.0, 0.0, 0.0"/>
+		</bsdf>
+		<emitter type="area">
+			<color name="radiance" value="100 100 100"/>
+		</emitter>
+	</mesh>
+	
+	
+	<!-- ROOM -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/ground.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.6, 0.6, 0.6"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/frontwall.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.6, 0.6, 0.6"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/leftwall.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.6, 0.6, 0.6"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/rightwall.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.6, 0.6, 0.6"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/backwall.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.6, 0.6, 0.6"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- BASE CUBES -->
+	<!-- White : 0.8  -->
+	<!-- Black kd : 0.2  -->
+	<!-- ROW1 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r1c1.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r1c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r1c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW2 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r2c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r2c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r2c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW3 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r3c1.obj"/>
+		<bsdf type="microfacet">	
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r3c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r3c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW4 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r4c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r4c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r4c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW5 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r5c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r5c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r5c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW6 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r6c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r6c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r6c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW7 -->	<mesh type="obj">
+		<string name="filename" value="meshes/r7c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r7c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r7c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- ROW8 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r8c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r8c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r8c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+		
+	<!-- ROW9 -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/r9c1.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r9c2.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/r9c3.obj"/>
+		<bsdf type="microfacet">
+			<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.2, 0.2, 0.2"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- THRONE -->
+	<mesh type="obj">
+		<string name="filename" value="meshes/throne_base.obj"/>
+		<bsdf type="diffuse">
+			<color name="albedo" value="0.8, 0.8, 0.8"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/throne.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Cu"/>
+			<float name="alpha" value="0.5"/>
+		</bsdf>
+	</mesh>
+	
+	
+	<!-- KING -->
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/king.obj"/>
+		<bsdf type="smoothconductor">
+			<string name="cior" value="Au"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="meshes/kingcrown.obj"/>
+		<bsdf type="smoothconductor">
+			<string name="cior" value="Au"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- BLACK PAWNS -->
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp1.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp2.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp3.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp4.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp5.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp6.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp7.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/bp8.obj"/>
+		<bsdf type="microfacet">
+		<float name="alpha" value = "0.001"/>
+			<color name="kd" value="0.1, 0.1, 0.1"/>
+		</bsdf>
+	</mesh>
+	
+	<!-- WHITE PAWNS -->
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp1.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp2.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp3.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp4.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp5.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp6.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp7.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	
+	<mesh type="obj">
+		<string name="filename" value="lowpolymeshes/wp8.obj"/>
+		<bsdf type="roughconductor">
+			<string name="cior" value="Ag"/>
+			<float name="alpha" value="0.07"/>
+		</bsdf>
+	</mesh>
+	<!-- -->
+	
+</scene>

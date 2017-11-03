@@ -1,7 +1,5 @@
 ## Nori
 
-Nori is a simple ray tracer written in C++. It runs on Windows, Linux, and Mac OS and provides basic functionality that is required to complete the assignments in the course CS 87/187 Rendering Algorithms taught at Dartmouth College.
+Nori is a simple ray tracer written in C++. This version of Nori contains the code that was written as a part of my CS87/187 coursework at Dartmouth College. The code was also used to render the winning entry in the Dartmouth Rendering competition.
 
-### Course information and framework documentation
-
-For access to course information including slides, reading material, and assignment descriptions, visit the main [Rendering Algorithms website] (https://canvas.dartmouth.edu/courses/13856).
+![alt text](https://github.com/sriravic/nori-cs187/blob/master/images/newkinghascome.png)

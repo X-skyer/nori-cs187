@@ -97,7 +97,7 @@ public:
 		float G = smithBeckmannG1(bRec.wi, w_h) * smithBeckmannG1(bRec.wo, w_h);
 
 		Color3f specular = m_ks * F * D * G / (4 * (Frame::cosTheta(bRec.wi) * Frame::cosTheta(bRec.wo)));
-		if (!specular.isValid) specular = Color3f(0.0f);
+		if (!specular.isValid()) specular = Color3f(0.0f);
 		return specular + diffuse;
 	}
 

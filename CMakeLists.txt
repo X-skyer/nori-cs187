@@ -118,6 +118,7 @@ add_executable(nori
   src/dielectric.cpp
   src/photonmapper.cpp
   src/arealight.cpp
+  src/volpath.cpp
   src/volpath_singlescattering.cpp
 )
 

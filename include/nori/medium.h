@@ -27,7 +27,7 @@ public:
 
 	~Medium();
 
-	virtual bool sample_distance(const Ray3f& ray, MediumSamplingRecord& mRec, const Point2f& sample) const = 0;
+	virtual bool sample(const Ray3f& ray, MediumSamplingRecord& mRec, const Point2f& sample) const = 0;
 
 	virtual void eval(const Ray3f& ray, MediumSamplingRecord& mRec) const = 0;
 

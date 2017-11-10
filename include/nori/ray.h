@@ -23,6 +23,9 @@
 
 NORI_NAMESPACE_BEGIN
 
+// forward declaration for medium
+class Medium;
+
 /**
  * \brief Simple n-dimensional ray segment data structure
  * 
@@ -45,6 +48,7 @@ template <typename _PointType, typename _VectorType> struct TRay {
     VectorType dRcp; ///< Componentwise reciprocals of the ray direction
     Scalar mint;     ///< Minimum position on the ray segment
     Scalar maxt;     ///< Maximum position on the ray segment
+	Medium* medium;
 
     /// Construct a new ray
     TRay() : mint(Epsilon), 
@@ -62,10 +66,16 @@ template <typename _PointType, typename _VectorType> struct TRay {
         update();
     }
 
+	/// Construct a new ray
+	TRay(const PointType &o, const VectorType &d,
+		Scalar mint, Scalar maxt, Medium* m) : o(o), d(d), mint(mint), maxt(maxt), medium(m) {
+		update();
+	}
+
     /// Copy constructor
     TRay(const TRay &ray) 
      : o(ray.o), d(ray.d), dRcp(ray.dRcp),
-       mint(ray.mint), maxt(ray.maxt) { }
+       mint(ray.mint), maxt(ray.maxt), medium(ray.medium) { }
 
     /// Copy a ray, but change the covered segment of the copy
     TRay(const TRay &ray, Scalar mint, Scalar maxt) 

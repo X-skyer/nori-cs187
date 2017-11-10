@@ -224,7 +224,6 @@ public:
 		return (Lm_emit + Lm_phase) / total_pdf;
 	}
 
-
 	Color3f Li(const Scene *scene, Sampler *sampler, const Ray3f &ray) const
 	{
 		Intersection isect;

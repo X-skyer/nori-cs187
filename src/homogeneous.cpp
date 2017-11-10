@@ -16,7 +16,7 @@ public:
 		m_sigmaT = m_sigmaA + m_sigmaS;
 	}
 
-	bool sample_distance(const Ray3f& ray, MediumSamplingRecord& mRec, const Point2f& sample) const
+	bool sample(const Ray3f& ray, MediumSamplingRecord& mRec, const Point2f& sample) const
 	{
 		// choose the component of sigmaT to sample
 		int component = floor(sample.x() * 3.0f);
